@@ -4,7 +4,7 @@ A summarized overview of all changes, per version of this project.
 
 > Entries will be added in reverse chronological order, so with the most recent at the top.
 >
-> An active in-development version carries a `-pre` suffix (e.g. `v1.0.1-pre`) on both this heading and
+> An active in-development version carries a `-pre` suffix (e.g. `v2.0.0-pre`) on both this heading and
 > `gradle.properties`'s `version`. On release, the suffix is replaced with a status tag:
 > - `[{{date}}]` - frozen/finalized on {{date}}
 > - `[released: {{date}}]` - released to package manager or production on {{date}}
@@ -12,7 +12,7 @@ A summarized overview of all changes, per version of this project.
 
 ---
 
-## v1.2.1-pre
+## v2.0.0-pre
 - Build: **Breaking:** Renamed the project to `template.java` (jar `template.java-<version>.jar`) and changed the group to `com.pellicciotta`.
 - Build: **Breaking:** Replaced `com.hinolugi:hinolugi-support:5.1.0` with `com.pellicciotta:support.java:1.0.0`; CI now reads the `PACKAGES_TOKEN` secret.
 - Build: Centralized dependency and plugin versions in `gradle/libs.versions.toml`.
