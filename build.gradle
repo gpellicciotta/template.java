@@ -1,6 +1,7 @@
 plugins {
   id 'application'
-  id 'com.diffplug.spotless' version '8.10.1'
+  id 'checkstyle'
+  alias(libs.plugins.spotless)
 }
 
 // group, version, and author are read from gradle.properties - the single source of truth, read back at
@@ -9,11 +10,11 @@ ext.vendor = author // Copyright name for the jar manifest - see Cli.java
 
 repositories {
   mavenCentral()
-  // hinolugi-support.java is a private GitHub Packages repo (see docs/devops.md, section 1) - derived projects
-  // stay in the private hinolugi family from the start rather than bolting this on later. Credentials come from
-  // {user.home}/.gradle/gradle.properties or GITHUB_USERNAME/GITHUB_TOKEN env vars; a PAT needs read:packages.
+  // support.java is published to GitHub Packages (see docs/devops.md, section "Prerequisites and Environment").
+  // Credentials come from {user.home}/.gradle/gradle.properties or GITHUB_USERNAME/GITHUB_TOKEN env vars; a PAT
+  // needs read:packages.
   maven {
-    url = 'https://maven.pkg.github.com/gpellicciotta/hinolugi-support.java'
+    url = 'https://maven.pkg.github.com/gpellicciotta/support.java'
     credentials {
       username = project.findProperty("github.username") ?: System.getenv("GITHUB_USERNAME")
       password = project.findProperty("github.token") ?: System.getenv("GITHUB_TOKEN")
@@ -22,11 +23,11 @@ repositories {
 }
 
 dependencies {
-  implementation     'com.hinolugi:hinolugi-support:5.1.0'
-  testImplementation 'org.junit.jupiter:junit-jupiter-api:6.1.3'
-  testRuntimeOnly    'org.junit.jupiter:junit-jupiter-engine:6.1.3'
+  implementation     libs.support.java
+  testImplementation libs.junit.jupiter.api
+  testRuntimeOnly    libs.junit.jupiter.engine
   // Gradle 9 no longer bundles the JUnit Platform launcher - must be declared explicitly.
-  testRuntimeOnly    'org.junit.platform:junit-platform-launcher:6.1.3'
+  testRuntimeOnly    libs.junit.platform.launcher
 }
 
 java {
@@ -50,6 +51,12 @@ application {
   mainClass = 'myproject.Cli'
 }
 
+// Style rules Spotless cannot enforce (braces, Javadoc, package-info) - see config/checkstyle/checkstyle.xml.
+checkstyle {
+  toolVersion = libs.versions.checkstyle.get()
+  maxWarnings = 0
+}
+
 test {
   useJUnitPlatform()
   testLogging.showStandardStreams = true
@@ -66,7 +73,7 @@ spotless {
     leadingTabsToSpaces(2)
   }
   groovyGradle {
-    target '*.gradle'
+    target '*.gradle', 'gradle/*.gradle'
     trimTrailingWhitespace()
     endWithNewline()
     leadingTabsToSpaces(2)
@@ -107,5 +114,5 @@ jar {
   }
 }
 
-// doFullRelease and its supporting tasks - see gradle/release.gradle and docs/devops.md, section 4.
+// doFullRelease and its supporting tasks - see gradle/release.gradle and docs/devops.md, section "Release Process".
 apply from: "$rootDir/gradle/release.gradle"

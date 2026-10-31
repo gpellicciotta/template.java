@@ -1,0 +1,14 @@
+[versions]
+checkstyle = "14.3.0"
+junit = "6.1.3"
+spotless = "8.10.1"
+support-java = "1.0.0"
+
+[libraries]
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
+support-java = { module = "com.pellicciotta:support.java", version.ref = "support-java" }
+
+[plugins]
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

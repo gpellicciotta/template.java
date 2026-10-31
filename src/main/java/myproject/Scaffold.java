@@ -14,23 +14,30 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /** Creates a new project as a renamed copy of this template project. */
-public final class Scaffold
-{
+public final class Scaffold {
   private Scaffold() { }
 
-  public static final class ScaffoldException extends Exception
-  {
-    public ScaffoldException(String message) { super(message); }
+  /** Signals that a project could not be scaffolded. */
+  public static final class ScaffoldException extends Exception {
+    /**
+     * Creates the exception.
+     *
+     * @param message what went wrong
+     */
+    public ScaffoldException(String message) {
+      super(message);
+    }
   }
 
   static final String PACKAGE_NAME = "myproject";
-  static final String PROJECT_SLUG = "template-project";
-  static final String REPO_SLUG = "java-template-project";
+  static final String PROJECT_SLUG = "template.java";
   static final String TITLE_PLACEHOLDER = "Java Template Project";
 
   private static final String INITIAL_VERSION = "0.1.0-pre";
 
-  private static final List<String> MARKER_FILES = List.of("build.gradle", "TODO.md", "CHANGELOG.md");
+  private static final List<String> MARKER_FILES = List.of("build.gradle", "PLAN.md", "CHANGELOG.md");
+  // The template's own planning history (tasks, work files) is not inherited by new projects.
+  private static final List<Path> EXCLUDED_PATHS = List.of(Path.of(".plan", "tasks"), Path.of(".plan", "work"));
   private static final Set<String> EXCLUDED_NAMES = Set.of(
       ".git", ".gradle", "build", "out", ".idea", ".vscode", "work", "__pycache__"
   );
@@ -45,7 +52,8 @@ public final class Scaffold
     Path start;
     try {
       start = Paths.get(Cli.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-    } catch (URISyntaxException | NullPointerException | SecurityException e) {
+    }
+    catch (URISyntaxException | NullPointerException | SecurityException e) {
       start = Paths.get(System.getProperty("user.dir"));
     }
     for (Path candidate = start; candidate != null; candidate = candidate.getParent()) {
@@ -56,9 +64,9 @@ public final class Scaffold
       }
     }
     throw new ScaffoldException(
-        "Could not locate the template project root (expected build.gradle, TODO.md, CHANGELOG.md and "
+        "Could not locate the template project root (expected build.gradle, PLAN.md, CHANGELOG.md and "
         + "src/main/java/" + PACKAGE_NAME + "/ in a parent directory). 'create' must be run from within a "
-        + "checkout of " + REPO_SLUG + " (e.g. via 'gradlew run --args=\"create ...\"')."
+        + "checkout of " + PROJECT_SLUG + " (e.g. via 'gradlew run --args=\"create ...\"')."
     );
   }
 
@@ -91,6 +99,9 @@ public final class Scaffold
     try (Stream<Path> walk = Files.walk(source)) {
       walk.forEach(path -> {
         Path relative = source.relativize(path);
+        if (EXCLUDED_PATHS.stream().anyMatch(relative::startsWith)) {
+          return;
+        }
         for (Path part : relative) {
           if (EXCLUDED_NAMES.contains(part.toString()) || part.toString().endsWith(".egg-info")) {
             return; // Skip anything under an excluded directory.
@@ -100,15 +111,18 @@ public final class Scaffold
         try {
           if (Files.isDirectory(path)) {
             Files.createDirectories(target);
-          } else {
+          }
+          else {
             Files.createDirectories(target.getParent());
             Files.copy(path, target, StandardCopyOption.COPY_ATTRIBUTES);
           }
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
           throw new UncheckedIOException(e);
         }
       });
-    } catch (IOException | UncheckedIOException e) {
+    }
+    catch (IOException | UncheckedIOException e) {
       throw new ScaffoldException("Failed to copy template tree: " + e.getMessage());
     }
   }
@@ -119,13 +133,14 @@ public final class Scaffold
       Path newDir = oldDir.resolveSibling(packageName);
       try {
         Files.move(oldDir, newDir);
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         throw new ScaffoldException("Failed to rename " + oldDir + ": " + e.getMessage());
       }
     }
   }
 
-  /** old -> new replacements, applied in order; order matters since {@link #REPO_SLUG} contains {@link #PROJECT_SLUG}. */
+  /** old -> new replacements, applied in order; order matters when one placeholder contains another. */
   private static void rewriteTextFiles(Path root, List<String[]> replacements) throws ScaffoldException {
     try (Stream<Path> walk = Files.walk(root)) {
       for (Path path : (Iterable<Path>) walk.filter(Files::isRegularFile)::iterator) {
@@ -136,7 +151,8 @@ public final class Scaffold
         String text;
         try {
           text = Files.readString(path, StandardCharsets.UTF_8);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
           continue; // Not valid UTF-8 text (e.g. a binary file) - leave it untouched.
         }
         String newText = text;
@@ -147,7 +163,8 @@ public final class Scaffold
           Files.writeString(path, newText, StandardCharsets.UTF_8);
         }
       }
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new ScaffoldException("Failed to rewrite template placeholders: " + e.getMessage());
     }
   }
@@ -167,31 +184,26 @@ public final class Scaffold
         + "- Initial release of the " + title + " project.\n";
     try {
       Files.writeString(destination.resolve("CHANGELOG.md"), content, StandardCharsets.UTF_8);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new ScaffoldException("Failed to write CHANGELOG.md: " + e.getMessage());
     }
   }
 
-  private static void writeFreshTodoMd(Path destination) throws ScaffoldException {
-    String content = "# TODO\n\n"
+  private static void writeFreshPlanMd(Path destination) throws ScaffoldException {
+    String content = "# Project Planning\n"
         + "An overview of all tasks and their planning.\n\n"
-        + "> Tasks are listed by milestone.\n"
-        + "> See [coordinating work guidelines](https://github.com/gpellicciotta/dev-guidelines/blob/main/guidelines/coordinating-work-guidelines.md) for the full coordination protocol.\n"
-        + ">\n"
-        + "> Status: `[ ]` available · `[~]` active · `[!]` blocked · `[?]` needs-review\n"
-        + "> Owner: `@name` shown only when active/blocked/needs-review.\n"
-        + "> Dependencies: `[needs: Tnnnn]` shown only when unresolved.\n\n"
-        + "**Next ID:** 0001\n\n"
         + "---\n\n"
-        + "## Next Milestone\n\n"
+        + "## Next Milestone\n"
         + "*(Currently no tasks)*\n\n"
         + "---\n\n"
-        + "## Backlog\n\n"
+        + "## Backlog\n"
         + "*(Currently no tasks)*\n";
     try {
-      Files.writeString(destination.resolve("TODO.md"), content, StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      throw new ScaffoldException("Failed to write TODO.md: " + e.getMessage());
+      Files.writeString(destination.resolve("PLAN.md"), content, StandardCharsets.UTF_8);
+    }
+    catch (IOException e) {
+      throw new ScaffoldException("Failed to write PLAN.md: " + e.getMessage());
     }
   }
 
@@ -201,7 +213,8 @@ public final class Scaffold
       String text = Files.readString(gradleProperties, StandardCharsets.UTF_8);
       String newText = text.replaceFirst("(?m)^version\\s*=\\s*.*$", "version=" + INITIAL_VERSION);
       Files.writeString(gradleProperties, newText, StandardCharsets.UTF_8);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new ScaffoldException("Failed to reset gradle.properties's version: " + e.getMessage());
     }
   }
@@ -211,9 +224,14 @@ public final class Scaffold
    *
    * <p>Automates the manual steps documented in this template's README under "Starting a new project from
    * this template": copy the tree, rename the {@code myproject} package (in both {@code src/main} and
-   * {@code src/test}), replace the {@code template-project} / {@code java-template-project} name placeholders
-   * throughout, and reset {@code CHANGELOG.md}, {@code TODO.md}, and {@code gradle.properties}'s {@code version} -
+   * {@code src/test}), replace the {@code template.java} name placeholder
+   * throughout, and reset {@code CHANGELOG.md}, {@code PLAN.md}, and {@code gradle.properties}'s {@code version} -
    * the new project starts its own history rather than inheriting the template's.
+   *
+   * @param projectName name of the new project, also used for its directory
+   * @param outputDir directory in which to create the project
+   * @return the created project directory
+   * @throws ScaffoldException if the template cannot be located, the destination exists, or copying fails
    */
   public static Path createProject(String projectName, String outputDir) throws ScaffoldException {
     Path templateRoot = findTemplateRoot();
@@ -228,7 +246,8 @@ public final class Scaffold
 
     try {
       Files.createDirectories(destination.getParent());
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       throw new ScaffoldException("Failed to create " + destination.getParent() + ": " + e.getMessage());
     }
     copyTree(templateRoot, destination);
@@ -237,14 +256,13 @@ public final class Scaffold
     renamePackageDir(destination, "test", packageName);
 
     rewriteTextFiles(destination, List.of(
-        new String[]{REPO_SLUG, projectName},
         new String[]{PROJECT_SLUG, projectName},
         new String[]{TITLE_PLACEHOLDER, title},
         new String[]{PACKAGE_NAME, packageName}
     ));
 
     writeFreshChangelogMd(destination, title);
-    writeFreshTodoMd(destination);
+    writeFreshPlanMd(destination);
     resetGradlePropertiesVersion(destination);
 
     return destination;

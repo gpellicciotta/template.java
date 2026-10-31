@@ -7,20 +7,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Sample CLI for template-project. {@link #run} is the testable entry point (returns an exit code, never
+ * Sample CLI for template.java. {@link #run} is the testable entry point (returns an exit code, never
  * calls {@link System#exit}); {@link #main} is the real process entry point.
  */
-public final class Cli
-{
+public final class Cli {
   private Cli() { }
 
+  /** Application name from the jar manifest, or {@code template.java} when running from compiled classes. */
   public static String name() {
     String n = Cli.class.getPackage().getImplementationTitle();
     // Same jar-manifest-only caveat as version() below: Implementation-Title only resolves when running from
     // the built jar, not when running compiled classes directly (e.g. `gradlew run` or the test suite).
-    return (n != null) ? n : "template-project";
+    return (n != null) ? n : "template.java";
   }
 
+  /** Application version from the jar manifest, or {@code 0.0.0+unknown} when running from compiled classes. */
   public static String version() {
     String v = Cli.class.getPackage().getImplementationVersion();
     // Package.getImplementationVersion() only resolves when running from a jar with a manifest (e.g. the
@@ -29,6 +30,7 @@ public final class Cli
     return (v != null) ? v : "0.0.0+unknown";
   }
 
+  /** Vendor name from the jar manifest, or the template author when running from compiled classes. */
   public static String vendor() {
     String v = Cli.class.getPackage().getImplementationVendor();
     // Same jar-manifest-only caveat as version()/name(): Implementation-Vendor only resolves when running
@@ -36,10 +38,17 @@ public final class Cli
     return (v != null) ? v : "Giovanni Pellicciotta";
   }
 
+  /** Single-line {@code name vVersion - Copyright vendor} text shown by {@code version}. */
   public static String versionLine() {
     return name() + " v" + version() + " - Copyright " + vendor();
   }
 
+  /**
+   * Builds the usage text.
+   *
+   * @param verbose whether to include the extended details section
+   * @return the usage text
+   */
   public static String helpMessage(boolean verbose) {
     StringBuilder sb = new StringBuilder();
     sb.append(versionLine()).append("\n\n");
@@ -60,7 +69,7 @@ public final class Cli
       sb.append("details:\n");
       sb.append("  create:\n");
       sb.append("    Copies this template tree to <dir>/<project-name>, updates package declarations,\n");
-      sb.append("    resets CHANGELOG.md and TODO.md, and initializes a fresh gradle.properties version.\n\n");
+      sb.append("    resets CHANGELOG.md and PLAN.md, and initializes a fresh gradle.properties version.\n\n");
     }
     sb.append("exit codes:\n");
     sb.append("  0  Success (including help and version display)\n");
@@ -68,6 +77,14 @@ public final class Cli
     return sb.toString();
   }
 
+  /**
+   * Runs the CLI without terminating the JVM.
+   *
+   * @param rawArgs command-line arguments, including the global {@code --debug} and {@code --log-file} options
+   * @param out standard output stream
+   * @param err standard error stream
+   * @return the process exit code: 0 on success, 1 on error
+   */
   public static int run(String[] rawArgs, PrintStream out, PrintStream err) {
     boolean debugEnabled = false;
     Path logFile = null;
@@ -76,9 +93,11 @@ public final class Cli
       String a = rawArgs[i];
       if ("--debug".equals(a)) {
         debugEnabled = true;
-      } else if ("--log-file".equals(a) && (i + 1 < rawArgs.length)) {
+      }
+      else if ("--log-file".equals(a) && (i + 1 < rawArgs.length)) {
         logFile = Path.of(rawArgs[++i]);
-      } else {
+      }
+      else {
         remaining.add(a);
       }
     }
@@ -87,7 +106,8 @@ public final class Cli
 
     try {
       return dispatch(args, out, err, debugEnabled, logFile);
-    } catch (UncheckedIOException e) {
+    }
+    catch (UncheckedIOException e) {
       err.println("error: failed to write --log-file '" + logFile + "': " + e.getCause().getMessage());
       return 1;
     }
@@ -144,7 +164,8 @@ public final class Cli
         out.println("Created new project at " + destination);
         logCompletion(startedAt, 0);
         return 0;
-      } catch (Scaffold.ScaffoldException e) {
+      }
+      catch (Scaffold.ScaffoldException e) {
         Log.error("error: " + e.getMessage());
         logCompletion(startedAt, 1);
         return 1;
@@ -169,6 +190,11 @@ public final class Cli
     Log.info("Completed in " + (System.currentTimeMillis() - startedAt) + "ms (exit code " + exitCode + ")");
   }
 
+  /**
+   * Process entry point.
+   *
+   * @param args command-line arguments
+   */
   public static void main(String[] args) {
     System.exit(run(args, System.out, System.err));
   }

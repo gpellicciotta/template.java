@@ -14,14 +14,23 @@ import java.time.format.DateTimeFormatter;
  * Minimal reference logging implementation, just enough to satisfy the cross-project logging guideline:
  * formatted log lines to stdout/stderr and an optional append-only log file, with {@code DEBUG} gated behind
  * an explicit opt-in. Deliberately a single global sink rather than a named-logger SPI (see
- * hinolugi-support.java's {@code logging} package for that) - grow into one only once a template-derived
- * project actually needs multiple back-ends or per-component loggers.
+ * support.java's {@code com.pellicciotta.support.logging} package for that) - grow into one only once a
+ * template-derived project actually needs multiple back-ends or per-component loggers.
  */
-public final class Log
-{
+public final class Log {
   private Log() { }
 
-  public enum Level { ERROR, WARN, INFO, DEBUG }
+  /** Severity of a log line, from most to least severe. */
+  public enum Level {
+    /** A failure that stops the operation. */
+    ERROR,
+    /** A problem the operation recovered from. */
+    WARN,
+    /** Normal operational progress. */
+    INFO,
+    /** Diagnostic detail, emitted only when debug logging is enabled. */
+    DEBUG
+  }
 
   private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -38,24 +47,44 @@ public final class Log
     err = errStream;
   }
 
-  public static void error(String message) { write(Level.ERROR, null, message); }
+  /** Logs an error message. */
+  public static void error(String message) {
+    write(Level.ERROR, null, message);
+  }
 
-  public static void error(String origin, String message) { write(Level.ERROR, origin, message); }
+  /** Logs an error message attributed to an origin. */
+  public static void error(String origin, String message) {
+    write(Level.ERROR, origin, message);
+  }
 
-  public static void warn(String message) { write(Level.WARN, null, message); }
+  /** Logs a warning message. */
+  public static void warn(String message) {
+    write(Level.WARN, null, message);
+  }
 
-  public static void warn(String origin, String message) { write(Level.WARN, origin, message); }
+  /** Logs a warning message attributed to an origin. */
+  public static void warn(String origin, String message) {
+    write(Level.WARN, origin, message);
+  }
 
-  public static void info(String message) { write(Level.INFO, null, message); }
+  /** Logs an informational message. */
+  public static void info(String message) {
+    write(Level.INFO, null, message);
+  }
 
-  public static void info(String origin, String message) { write(Level.INFO, origin, message); }
+  /** Logs an informational message attributed to an origin. */
+  public static void info(String origin, String message) {
+    write(Level.INFO, origin, message);
+  }
 
+  /** Logs a debug message; discarded unless debug logging is enabled. */
   public static void debug(String message) {
     if (debugEnabled) {
       write(Level.DEBUG, null, message);
     }
   }
 
+  /** Logs a debug message attributed to an origin; discarded unless debug logging is enabled. */
   public static void debug(String origin, String message) {
     if (debugEnabled) {
       write(Level.DEBUG, origin, message);
@@ -102,7 +131,8 @@ public final class Log
       try {
         Files.writeString(file, fileLine + System.lineSeparator(), StandardCharsets.UTF_8,
             StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         throw new UncheckedIOException("failed to append to log file " + file, e);
       }
     }

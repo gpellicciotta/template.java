@@ -8,7 +8,7 @@
  * business logic a project built from this template would keep; {@link myproject.Log} is a minimal,
  * dependency-free reference logging implementation (formatted lines, {@code --debug}/{@code --log-file})
  * deliberately kept as a single global sink rather than a named-logger SPI — grow into one (see
- * hinolugi-support.java's {@code logging} package for that shape) only once a template-derived project
+ * support.java's {@code com.pellicciotta.support.logging} package for that shape) only once a template-derived project
  * actually needs multiple back-ends or per-component loggers.
  *
  * <p>If your own project's packages grow non-obvious design decisions worth recording, this is the place —

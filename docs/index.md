@@ -5,19 +5,16 @@ Overview of all documentation and specifications for this project.
 ---
 
 ## Core Documentation
-
 - [Requirements](requirements.md): High-level goals, functional scope, and technical requirements.
 - [DevOps & Operations](devops.md): Environment prerequisites, development workflows, testing, scaffolding, and release processes.
 
 ---
 
 ## Architecture & Design Notes
-
 - [Multi-Module Gradle Projects](multi-module.md): Common, library, and application conventions, explicit directory mapping, and migration checks.
 - [Publishing a Reusable Library](library-publishing.md): Optional maven-publish and GitHub Packages pattern for template-derived library projects.
 
 ---
 
 ## Guidelines
-
 - [Cross-Project Development Guidelines](https://github.com/gpellicciotta/dev-guidelines): Universal standards, language guidelines, and task coordination protocols.

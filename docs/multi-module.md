@@ -4,7 +4,6 @@ Keep this template as one Gradle module until a distinct second module is necess
 Then share build logic through three Groovy conventions: common Java defaults, reusable libraries, and runnable applications.
 
 ## The pattern, once you need it
-
 Both `hinolugi-counters` and `hinolugi-auth` define this structure in their `buildSrc/src/main/groovy/` directories.
 The library and application conventions each apply common; application does not inherit library.
 For specialized packaging, such as WAR files, apply common with the appropriate packaging plugin.
@@ -36,7 +35,6 @@ The examples use `clients/java` as a library and `server` as an application cons
 This dependency illustrates project wiring; choose dependencies according to your actual module responsibilities.
 
 ## Map logical projects to directories
-
 `settings.gradle`:
 
 ```groovy
@@ -59,7 +57,6 @@ Gradle discovers `buildSrc` automatically; do not add it to the root `include` l
 ## Define shared conventions
 
 ### Compile the plugins
-
 `buildSrc/build.gradle` — just enough to compile the convention plugins below:
 
 ```groovy
@@ -73,7 +70,6 @@ repositories {
 ```
 
 ### Common Java defaults
-
 `buildSrc/src/main/groovy/<group>.java-common-conventions.gradle`:
 
 ```groovy
@@ -116,7 +112,6 @@ The shared defaults retain test output streaming, source archives, and HTML5 Jav
 Each Java subproject's `build` produces its main jar, `-sources.jar`, and `-javadoc.jar` under its own `build/libs/`.
 
 ### Reusable libraries
-
 `buildSrc/src/main/groovy/<group>.java-library-conventions.gradle`:
 
 ```groovy
@@ -130,7 +125,6 @@ Declare dependencies exposed through public signatures with `api`; use `implemen
 Publishing remains an optional concern covered in [Publishing a Reusable Library](library-publishing.md).
 
 ### Runnable applications
-
 `buildSrc/src/main/groovy/<group>.java-application-conventions.gradle`:
 
 ```groovy
@@ -147,7 +141,6 @@ Direct `java -jar` execution additionally needs manifest and dependency packagin
 These are [precompiled script plugins](https://docs.gradle.org/current/userguide/implementing_gradle_plugins_precompiled.html): each filename determines its plugin ID without `.gradle`.
 
 ## Apply conventions in each module
-
 `clients/java/build.gradle`:
 
 ```groovy
@@ -176,7 +169,6 @@ Replace the example main class with your application's fully qualified entry poi
 Keep module-specific dependencies and packaging in each module's build file.
 
 ## Migrate and verify
-
 - Move production code, tests, and resources into the owning module's standard `src/main` and `src/test` trees.
 - Keep the wrapper, daemon toolchain, and shared `gradle.properties` at the root.
 - Move shared repository configuration into common, including private repositories needed by your dependencies.

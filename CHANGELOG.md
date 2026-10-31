@@ -13,9 +13,16 @@ A summarized overview of all changes, per version of this project.
 ---
 
 ## v1.2.1-pre
+- Build: **Breaking:** Renamed the project to `template.java` (jar `template.java-<version>.jar`) and changed the group to `com.pellicciotta`.
+- Build: **Breaking:** Replaced `com.hinolugi:hinolugi-support:5.1.0` with `com.pellicciotta:support.java:1.0.0`; CI now reads the `PACKAGES_TOKEN` secret.
+- Build: Centralized dependency and plugin versions in `gradle/libs.versions.toml`.
+- Build: Added Checkstyle for Stroustrup braces and public API Javadoc, and reformatted and documented the sources accordingly.
+- DevEx: Added `scripts/devops.py` and ran CI through it; removed `create-github-release.py` in favor of `devops.py release`.
+- DevEx: Replaced the release pipeline with the confirmed, CI-gated `doFullRelease` from `support.java`; mainline is now `main`.
+- CLI: Fixed `create` failing to find the template root and writing a stale `TODO.md`; it now uses `PLAN.md` and skips the template's task files.
+- Docs: Replaced `TODO.md` coordination guidance with `plan` guidance and updated the docs for the renames.
 
 ## v1.2.0 [released: 2026-09-11]
-
 - DevEx: Recognize linked worktree Git files in bootstrap repository detection to avoid redundant repository initialization.
 - Docs: Correct stale version metadata references in README.md and CLI scaffolding help.
 - DevEx: Add GitHub release script to automate quality checks, tagging, publishing, and next-version bump.

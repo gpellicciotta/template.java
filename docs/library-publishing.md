@@ -3,10 +3,9 @@
 This template ships as an application (`plugins { id 'application' }`), not a library, and deliberately does
 not include publishing configuration by default — see CLAUDE.md's "Favour simplicity over ingenuity". Add the
 pattern below only if your project derived from this template is itself a reusable library consumed by other
-projects (e.g. `hinolugi-support.java`, consumed by `hinolugi-auth`).
+projects (e.g. `support.java`, consumed by `hinolugi-auth`).
 
 ## The pattern, once you need it
-
 Apply `maven-publish` alongside (or instead of) `application`, and configure a library publication.
 Retain the template's existing source and Javadoc archive configuration:
 
@@ -44,7 +43,6 @@ publishing {
 ```
 
 Notes:
-
 - The template already enables `withJavadocJar()` and `withSourcesJar()`; `from components.java` includes both
   companion archives in the publication.
 - The GitHub Packages repository block above is a template — swap in your own `<owner>/<repo>`, and never
@@ -55,6 +53,6 @@ Notes:
   each derived project opts in deliberately.
 - Consuming projects add a matching `repositories { maven { url = ...; credentials { ... } } }` block pointing
   at the same GitHub Packages URL, plus the dependency itself (e.g.
-  `implementation 'com.hinolugi:hinolugi-support:<version>'`).
+  `implementation 'com.pellicciotta:support.java:<version>'`).
 - Run `gradle publish` (or the repository-scoped task, e.g.
   `gradle publishMavenPublicationToGithubPackagesRepository`) to publish once credentials are configured.

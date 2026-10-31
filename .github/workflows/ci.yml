@@ -10,8 +10,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '25'
-      - name: Build and test
+      - name: Validate, build and test
         env:
           GITHUB_USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.HINOLUGI_PACKAGES_TOKEN }}
-        run: ./gradlew build
+          GITHUB_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
+        run: python3 scripts/devops.py check

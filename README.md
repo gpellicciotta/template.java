@@ -2,12 +2,11 @@
 
 A minimal starter project to get Java and Gradle development started quickly using the standard `src/main/java` + `src/test/java` layout.
 
-Includes JUnit 5 Jupiter for testing, the Gradle wrapper (pinned Gradle + JDK toolchain versions), a GitHub Actions CI workflow, and full adherence to cross-project development guidelines (`CHANGELOG.md`, `TODO.md`, `LICENSE.md`, and `docs/`).
+Includes JUnit 6 Jupiter for testing, the Gradle wrapper (pinned Gradle + JDK toolchain versions), a GitHub Actions CI workflow, and full adherence to cross-project development guidelines (`CHANGELOG.md`, `PLAN.md`, `LICENSE.md`, and `docs/`).
 
 ## Directory Layout
-
 ```text
-java-template-project/
+template.java/
   src/
     main/java/myproject/
       Core.java             # business logic
@@ -36,19 +35,25 @@ java-template-project/
     workflows/
       ci.yml                # gradlew build (compile + test + jar), on push/PR
   gradle/
+    libs.versions.toml      # central dependency and plugin versions
+    release.gradle          # doFullRelease pipeline
     wrapper/                # Gradle wrapper jar + properties (pinned Gradle version)
     gradle-daemon-jvm.properties  # pinned toolchain JDK version for the Gradle daemon itself
   gradlew / gradlew.bat
   LICENSE.md                # project license
   CHANGELOG.md              # versioned changes in reverse chronological order
-  TODO.md                   # milestone-based task tracking
-  build.gradle              # JDK toolchain, JUnit 5, application plugin, jar manifest
+  PLAN.md                   # task index, managed through the `plan` CLI
+  AGENTS.md                 # AI assistant pointer to the plan guidelines
+  .plan/                    # plan configuration, protocols, and task files
+  build.gradle              # JDK toolchain, JUnit 6, Checkstyle, Spotless, application plugin, jar manifest
+  config/checkstyle/        # Checkstyle rules (Stroustrup braces, public API Javadoc, package-info)
   gradle.properties         # group, version, author, copyright, and build settings
   settings.gradle           # rootProject.name
   .gitignore
   .editorconfig             # indent/charset/line-ending settings
   scripts/
     bootstrap-dev-environment.py  # one-shot bootstrap: git init, gradlew build
+    devops.py                     # CI-equivalent checks, build, test, versions, release
     deploy-to-production.py       # scaffolded example deploy script (placeholder)
   CLAUDE.md                 # AI assistant guidance
 ```
@@ -58,11 +63,10 @@ java-template-project/
 Java uses the standard `src/main/java/{{package}}` + `src/test/java/{{package}}` layout (the Maven/Gradle default, and what every Java IDE expects out of the box).
 
 ## Quick Start
-
-`build.gradle` depends on `com.hinolugi:hinolugi-support`, hosted on the private `hinolugi-support.java` GitHub
+`build.gradle` depends on `com.pellicciotta:support.java`, hosted on the `support.java` GitHub
 Packages repo. Set a GitHub PAT with `read:packages` as `github.token`/`github.username` in
 `{user.home}/.gradle/gradle.properties`, or as the `GITHUB_USERNAME`/`GITHUB_TOKEN` env vars, before building
-(see `docs/devops.md`, section 1).
+(see `docs/devops.md`, section "Prerequisites and Environment").
 
 Open a shell in the project root and run:
 
@@ -70,25 +74,25 @@ Open a shell in the project root and run:
 python scripts/bootstrap-dev-environment.py
 ```
 
-This initializes a git repo (if one doesn't already exist) and runs `gradlew build`, which compiles the code, runs the test suite, and produces a jar in `build/libs/`.
+This initializes a git repo (if one doesn't already exist) and runs `gradlew build`, which compiles the code, checks formatting and style, runs the test suite, and produces a jar in `build/libs/`.
 
 `scripts/deploy-to-production.py` is a scaffolded placeholder for the dev-guidelines scripts-directory
 convention: this template has no production service, so it just prints guidance. Projects derived from
 this template that do deploy a service should replace its body with their real deployment steps.
 
 ## Running Tests
-
 ```powershell
 .\gradlew.bat test
 ```
 
-## CLI
+`python scripts/devops.py check` runs every CI validation step (Spotless, Checkstyle, tests, jar assembly).
 
+## CLI
 ```powershell
-java -jar build/libs/template-project-<version>.jar help
-java -jar build/libs/template-project-<version>.jar version
-java -jar build/libs/template-project-<version>.jar greet <name>
-java -jar build/libs/template-project-<version>.jar create <project-name> [-o <output-dir>]
+java -jar build/libs/template.java-<version>.jar help
+java -jar build/libs/template.java-<version>.jar version
+java -jar build/libs/template.java-<version>.jar greet <name>
+java -jar build/libs/template.java-<version>.jar create <project-name> [-o <output-dir>]
 ```
 
 `create` scaffolds a new project as a copy of this template at `<output-dir>/<project-name>` (current directory if `-o` is omitted), automating the renames described below in **Starting a new project from this template**. Run it from within a checkout of this template (i.e. after `python scripts/bootstrap-dev-environment.py` or `gradlew build` in this repo). `create` locates the template root by walking up from wherever its own compiled class was loaded from.
@@ -96,12 +100,11 @@ java -jar build/libs/template-project-<version>.jar create <project-name> [-o <o
 For a development run without building or naming the jar, use `.\gradlew.bat run --args="<command> [args]"`.
 
 ## Logging
-
 `greet` and `create` log a startup message (name, version, command, config) and a completion summary (duration,
 exit code) via `Log.java`, a minimal reference implementation of the cross-project logging guideline:
 
 ```powershell
-java -jar build/libs/template-project-<version>.jar --debug --log-file app.log greet Gio
+java -jar build/libs/template.java-<version>.jar --debug --log-file app.log greet Gio
 ```
 
 - `--debug` enables `DEBUG`-level messages (discarded by default).
@@ -112,7 +115,6 @@ java -jar build/libs/template-project-<version>.jar --debug --log-file app.log g
 `Log.info`/`Log.debug` directly from your own business logic to log more than the CLI's own start/stop events.
 
 ## Building the Jar
-
 ```powershell
 .\gradlew.bat build
 ```
@@ -120,37 +122,26 @@ java -jar build/libs/template-project-<version>.jar --debug --log-file app.log g
 The jar (with its version stamped into the manifest) lands in `build/libs/`.
 
 ## Releasing a Version
+Releases use the Gradle `doFullRelease` pipeline, which publishes (when configured), tags, pushes, and creates the
+GitHub release, then opens the next `-pre` version. Preview it, then run it:
 
-1. Choose the next semantic version, then update `version` in `gradle.properties`. This is the single source of truth used for the jar name and manifest.
-2. Add a dated entry for that version at the top of `CHANGELOG.md`.
-3. Run the full verification and build:
+```shell
+python scripts/devops.py release --dry-run
+python scripts/devops.py release
+```
 
-  ```powershell
-  .\gradlew.bat clean build
-  ```
-
-4. Commit the changes and create a matching annotated tag:
-
-  ```powershell
-  git add gradle.properties CHANGELOG.md README.md
-  git commit -m "Release v<version>"
-  git tag -a v<version> -m "Release v<version>"
-  git push origin HEAD --follow-tags
-  ```
-
-5. In GitHub, open **Releases**, choose **Draft a new release**, select the pushed `v<version>` tag, and add the release notes. Upload `build/libs/template-project-<version>.jar` under **Attach binaries**, then publish the release.
+It needs a clean `main` pushed to `origin` with green CI, and an authenticated `gh` CLI. See `docs/devops.md`,
+section "Release Process".
 
 ## Starting a new project from this template
-
 Preferred: run `gradlew run --args="create <project-name> [-o <output-dir>]"` (see **CLI** above) — it copies the tree and performs all required renaming automatically.
 
 To do it by hand instead: copy this folder, then rename every occurrence of the placeholder names below:
-
 - `src/main/java/myproject/` and `src/test/java/myproject/` → `src/main/java/<your_package_name>/` and `src/test/java/<your_package_name>/` (and every `package myproject;`/`import myproject...` line inside them)
-- `settings.gradle`'s `rootProject.name = 'template-project'`
+- `settings.gradle`'s `rootProject.name = 'template.java'`
 - This README's title, and `CLAUDE.md`'s placeholder sections
 - `CHANGELOG.md` — replace the version history with your project's initial `## v0.1.0-pre` entry
 - `gradle.properties`'s `version` — reset to `0.1.0-pre`
-- `TODO.md` — reset `**Next ID:**` to `0001` and initialize empty `## Next Milestone` and `## Backlog` sections
+- `PLAN.md` and `.plan/tasks/` — reset to empty `## Next Milestone` and `## Backlog` sections and no task files
 
 Then follow **Quick Start** above to verify the rename didn't break anything before writing real code.

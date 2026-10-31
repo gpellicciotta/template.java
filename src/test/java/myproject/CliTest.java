@@ -16,8 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class CliTest
-{
+class CliTest {
   private static String runAndCaptureOut(String... args) throws Exception {
     ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
     ByteArrayOutputStream errBuf = new ByteArrayOutputStream();
@@ -73,14 +72,14 @@ class CliTest
   @Test
   void versionCommand() throws Exception {
     String out = runAndCaptureOut("version").strip();
-    assertTrue(out.startsWith("template-project v"));
+    assertTrue(out.startsWith("template.java v"));
     assertTrue(out.contains("Copyright Giovanni Pellicciotta"));
   }
 
   @Test
   void versionOption() throws Exception {
     String out = runAndCaptureOut("--version").strip();
-    assertTrue(out.startsWith("template-project v"));
+    assertTrue(out.startsWith("template.java v"));
     assertTrue(out.contains("Copyright Giovanni Pellicciotta"));
   }
 
@@ -97,7 +96,7 @@ class CliTest
   @Test
   void greetLogsStartupAndCompletionByDefault() throws Exception {
     String out = runAndCaptureOut("greet", "Gio");
-    assertTrue(out.contains("Starting template-project"));
+    assertTrue(out.contains("Starting template.java"));
     assertTrue(out.contains("Completed in"));
   }
 
@@ -122,7 +121,7 @@ class CliTest
 
     assertTrue(Files.isRegularFile(logFile));
     String logged = Files.readString(logFile, StandardCharsets.UTF_8);
-    assertTrue(logged.contains("Starting template-project"));
+    assertTrue(logged.contains("Starting template.java"));
     assertTrue(logged.contains("Completed in"));
   }
 
@@ -187,18 +186,20 @@ class CliTest
     String changelog = Files.readString(destination.resolve("CHANGELOG.md"), StandardCharsets.UTF_8);
     assertTrue(changelog.contains("Initial release of the Sample App project."));
 
-    String todo = Files.readString(destination.resolve("TODO.md"), StandardCharsets.UTF_8);
+    String plan = Files.readString(destination.resolve("PLAN.md"), StandardCharsets.UTF_8);
     assertAll("fresh project metadata",
         () -> assertEquals(List.of("version=0.1.0-pre"),
             gradleProperties.lines().filter(line -> line.startsWith("version=")).toList()),
         () -> assertEquals(List.of("## v0.1.0-pre"),
             changelog.lines().filter(line -> line.startsWith("## ")).toList()),
         () -> assertFalse(changelog.contains("[in development]")),
-        () -> assertEquals(List.of("**Next ID:** 0001"),
-            todo.lines().filter(line -> line.startsWith("**Next ID:**")).toList()),
         () -> assertEquals(List.of("## Next Milestone", "## Backlog"),
-            todo.lines().filter(line -> line.startsWith("##")).toList()),
-        () -> assertEquals(2L, todo.lines().filter(line -> line.equals("*(Currently no tasks)*")).count()));
+            plan.lines().filter(line -> line.startsWith("##")).toList()),
+        () -> assertEquals(2L, plan.lines().filter(line -> line.equals("*(Currently no tasks)*")).count()),
+        () -> assertTrue(Files.isDirectory(destination.resolve(".plan/protocols"))),
+        () -> assertFalse(Files.exists(destination.resolve(".plan/tasks"))),
+        () -> assertFalse(buildGradle.contains("hinolugi")),
+        () -> assertFalse(Files.exists(destination.resolve("TODO.md"))));
 
     assertTrue(Files.isRegularFile(destination.resolve("docs/index.md")));
     assertTrue(Files.isRegularFile(destination.resolve("docs/requirements.md")));

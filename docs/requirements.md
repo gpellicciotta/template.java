@@ -1,11 +1,10 @@
 # Requirements
 
-Functional and technical requirements for the `java-project-template` project.
+Functional and technical requirements for the `template.java` project.
 
 ---
 
 ## High-Level Goals
-
 - Provide a standardized, minimal, and fully configured starter project template for Java development using Gradle.
 - Enable developers and AI assistants to bootstrap clean, production-ready Java projects adhering to cross-project development guidelines.
 - Provide out-of-the-box support for unit testing with JUnit 5, JDK toolchain pinning, manifest-based versioning, and GitHub Actions CI.
@@ -28,9 +27,9 @@ Functional and technical requirements for the `java-project-template` project.
 - Ensure core business logic remains independent of console streams, exit calls, or CLI frameworks for seamless unit testing.
 
 ### Project Scaffolding
-- Automate repository renaming, package restructuring, and fresh metadata in `CHANGELOG.md`, `TODO.md`, and `gradle.properties`.
+- Automate repository renaming, package restructuring, and fresh metadata in `CHANGELOG.md`, `PLAN.md`, and `gradle.properties`.
 - Initialize `gradle.properties` at `0.1.0-pre`, with a matching `## v0.1.0-pre` changelog heading.
-- Initialize TODO metadata with `**Next ID:** 0001` and empty peer-level Next Milestone and Backlog sections.
+- Reset `PLAN.md` to empty peer-level Next Milestone and Backlog sections, and leave out the template's `.plan/tasks` and `.plan/work` contents.
 - Prevent accidental overwrite when target directories already exist.
 
 ### Logging
@@ -44,16 +43,17 @@ Functional and technical requirements for the `java-project-template` project.
 ---
 
 ## Technical Requirements
-
 - **Java Version**: Explicitly targeted and compiled with Java 25 toolchain (`java.toolchain`).
 - **Build System**: Gradle with pinned Gradle wrapper (`gradlew` / `gradlew.bat`).
 - **Build Defaults**: Enable build caching, all warnings, rich console output, and info logging through root Gradle properties.
 - **Ownership Metadata**: Declare author and a literal copyright notice in `gradle.properties` for derived projects.
-- **Testing**: JUnit 5 Jupiter test framework with JUnit platform launcher.
+- **Testing**: JUnit 6 Jupiter test framework with JUnit platform launcher.
 - **Packaging**: Standard application plugin configuration generating runnable jar archives with manifest attributes (`Main-Class`, `Implementation-Title`, `Implementation-Version`, `Implementation-Vendor`).
 - **Build Timestamp**: Stamp the application JAR with `Build-Time` as an ISO-8601 UTC configuration timestamp by default.
 - **Reproducibility Tradeoff**: Accept changing application archives and repeated packaging while preserving caching for other eligible tasks.
 - **Companion Archives**: Generate source and Javadoc jars during `build`, including subprojects using the documented common convention.
 - **Javadoc**: Generate HTML5 documentation with doclint disabled and quiet output; retain failure on Javadoc errors.
+- **Static Checks**: Spotless (whitespace) and Checkstyle (Stroustrup braces, braces on every control block, public API Javadoc, `package-info.java`) run as part of `build`.
+- **Dependency Versions**: Declare all dependency and plugin versions centrally in `gradle/libs.versions.toml`.
 - **Code Standards**: 2-space indentation, UTF-8 encoding, US English, and LF line endings except CRLF for `.bat` and `.cmd` scripts.
 - **Binary Assets**: Declare common image, document, Java archive, compiled class, and font formats as binary in Git attributes.

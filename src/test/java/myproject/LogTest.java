@@ -14,8 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class LogTest
-{
+class LogTest {
   private final ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
   private final ByteArrayOutputStream errBuf = new ByteArrayOutputStream();
 
