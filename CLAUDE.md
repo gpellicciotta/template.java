@@ -1,3 +1,9 @@
+<!-- BEGIN plan (managed by plan init) -->
+This project tracks its work with plan in `PLAN.md` and `.plan/tasks/`.
+Load the `plan-task-usage-guidelines` skill before creating, starting, or changing tasks.
+Change `PLAN.md` and task frontmatter only through `plan` commands.
+<!-- END plan -->
+
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
