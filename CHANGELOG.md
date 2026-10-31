@@ -13,6 +13,7 @@ A summarized overview of all changes, per version of this project.
 ---
 
 ## v2.0.1-pre
+- DevEx: Removed the placeholder `scripts/deploy-to-production.py`; deployment belongs in `devops.py`, and this template deploys nothing.
 
 ---
 

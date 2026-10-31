@@ -26,11 +26,10 @@ See [environment prerequisites](docs/devops.md#prerequisites-and-environment) fo
 - Run the test suite only: `.\gradlew.bat test`
 - Run every CI validation step (Spotless, Checkstyle, tests, jars): `python scripts/devops.py check`
 - Release: `python scripts/devops.py release` runs the `doFullRelease` pipeline (pushes, creates a GitHub release). **Never run it unless the user explicitly asks.**
-- Deployment placeholder: `python scripts/deploy-to-production.py` prints guidance and exits with code 1; this template has no production service.
 - **[TODO]** Add any other project-specific commands here.
 
-Projects that deploy a service must replace the deployment script's body with their actual deployment steps.
-See the [development workflows](docs/devops.md#development-workflows) for bootstrap, build, and deployment details.
+Projects that deploy a service add a `production` subcommand to `scripts/devops.py`; this template deploys nothing.
+See the [development workflows](docs/devops.md#development-workflows) for bootstrap and build details.
 
 ## Architecture
 **[TODO]** Describe the packages and what each one owns — one paragraph per package is usually enough. Name it, state

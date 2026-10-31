@@ -54,7 +54,6 @@ template.java/
   scripts/
     bootstrap-dev-environment.py  # one-shot bootstrap: git init, gradlew build
     devops.py                     # CI-equivalent checks, build, test, versions, release
-    deploy-to-production.py       # scaffolded example deploy script (placeholder)
   CLAUDE.md                 # AI assistant guidance
 ```
 
@@ -75,10 +74,6 @@ python scripts/bootstrap-dev-environment.py
 ```
 
 This initializes a git repo (if one doesn't already exist) and runs `gradlew build`, which compiles the code, checks formatting and style, runs the test suite, and produces a jar in `build/libs/`.
-
-`scripts/deploy-to-production.py` is a scaffolded placeholder for the dev-guidelines scripts-directory
-convention: this template has no production service, so it just prints guidance. Projects derived from
-this template that do deploy a service should replace its body with their real deployment steps.
 
 ## Running Tests
 ```powershell
