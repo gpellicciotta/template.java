@@ -12,7 +12,7 @@ A summarized overview of all changes, per version of this project.
 
 ---
 
-## v2.0.0-pre
+## v2.0.0 [released: 2026-10-31]
 - Build: **Breaking:** Renamed the project to `template.java` (jar `template.java-<version>.jar`) and changed the group to `com.pellicciotta`.
 - Build: **Breaking:** Replaced `com.hinolugi:hinolugi-support:5.1.0` with `com.pellicciotta:support.java:1.0.0`; CI now reads the `PACKAGES_TOKEN` secret.
 - Build: Centralized dependency and plugin versions in `gradle/libs.versions.toml`.
