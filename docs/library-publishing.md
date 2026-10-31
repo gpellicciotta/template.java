@@ -3,7 +3,7 @@
 This template ships as an application (`plugins { id 'application' }`), not a library, and deliberately does
 not include publishing configuration by default — see CLAUDE.md's "Favour simplicity over ingenuity". Add the
 pattern below only if your project derived from this template is itself a reusable library consumed by other
-projects (e.g. `support.java`, consumed by `hinolugi-auth`).
+projects (e.g. `support.java`, consumed by `auth`).
 
 ## The pattern, once you need it
 Apply `maven-publish` alongside (or instead of) `application`, and configure a library publication.

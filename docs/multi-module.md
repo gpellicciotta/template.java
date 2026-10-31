@@ -4,7 +4,7 @@ Keep this template as one Gradle module until a distinct second module is necess
 Then share build logic through three Groovy conventions: common Java defaults, reusable libraries, and runnable applications.
 
 ## The pattern, once you need it
-Both `hinolugi-counters` and `hinolugi-auth` define this structure in their `buildSrc/src/main/groovy/` directories.
+Both `counters` and `auth` define this structure in their `buildSrc/src/main/groovy/` directories.
 The library and application conventions each apply common; application does not inherit library.
 For specialized packaging, such as WAR files, apply common with the appropriate packaging plugin.
 
