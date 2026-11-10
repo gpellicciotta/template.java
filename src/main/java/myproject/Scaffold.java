@@ -188,7 +188,7 @@ public final class Scaffold {
         + "> - `[broken]` - considered broken and not be used\n\n"
         + "---\n\n"
         + "## v" + INITIAL_VERSION + "\n\n"
-        + "- Initial release of the " + title + " project.\n";
+        + "- DevEx: Created the " + title + " project from the Java template.\n";
     try {
       Files.writeString(destination.resolve("CHANGELOG.md"), content, StandardCharsets.UTF_8);
     }

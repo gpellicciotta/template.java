@@ -13,15 +13,16 @@ A summarized overview of all changes, per version of this project.
 ---
 
 ## v3.0.0-pre
-- CLI: Fixed `create` failing in checkouts without plan data, such as CI; it finds the root by `build.gradle`, `settings.gradle`, and `CHANGELOG.md` instead of `PLAN.md`.
-- CLI: **Breaking:** `create` no longer writes `PLAN.md` and skips the template's plan store; run `plan init --store branch` in the new project.
-- DevEx: Replaced the hand-written [devops.py](scripts/devops.py) with a thin `DevopsCli` over support-python v2.0.0's `GradleProject`, adding `lint` and `format`.
-- DevEx: **Breaking:** `devops.py test` now takes Gradle test patterns as arguments (`test myproject.CoreTest`) instead of `--tests`.
-- DevEx: The bootstrap installs `scripts/requirements.txt` into a project-local `.venv`; `devops.py` reruns itself there, and `create` skips `.venv`.
-- DevEx: CI installs `scripts/requirements.txt` and runs the new `scripts/tests` unittest suite before `devops.py check`.
+- CLI: Gave the initial changelog entry that `create` writes a `DevEx:` area prefix and past-tense wording.
+- CLI: Fixed `create` failing without plan data, as in CI, by finding the root via [build.gradle](build.gradle), [settings.gradle](settings.gradle), and [CHANGELOG.md](CHANGELOG.md).
+- CLI: **[breaking]** Stopped `create` writing `PLAN.md` and copying the plan store; run `plan init --store branch` instead.
+- DevEx: Replaced the hand-written [devops.py](scripts/devops.py) with a thin `DevopsCli` over support-python v2.0.0, adding `lint` and `format`.
+- DevEx: **[breaking]** Changed `devops.py test` to take Gradle test patterns, such as `test myproject.CoreTest`, instead of `--tests`.
+- DevEx: Made the [bootstrap](scripts/bootstrap-dev-environment.py) fill a project-local `.venv`, where `devops.py` reruns itself; `create` skips `.venv`.
+- DevEx: Made [CI](.github/workflows/ci.yml) install [requirements.txt](scripts/requirements.txt) and run the [scripts/tests](scripts/tests/) suite before `devops.py check`.
 - DevEx: Made `devops.py lint` and `check` run `lint-markdown check` first, excluding [CHANGELOG.md](CHANGELOG.md) via [.lint-markdown.json](.lint-markdown.json).
 - Docs: Moved agent instructions into [AGENTS.md](AGENTS.md) in the standard section order and reduced [CLAUDE.md](CLAUDE.md) to its import.
-- DevEx: Removed the placeholder `scripts/deploy-to-production.py`; deployment belongs in `devops.py`, and this template deploys nothing.
+- DevEx: Removed the placeholder `scripts/deploy-to-production.py`, since this template deploys nothing and deployment belongs in [devops.py](scripts/devops.py).
 
 ---
 

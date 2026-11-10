@@ -187,7 +187,10 @@ class CliTest {
     assertTrue(Files.isRegularFile(destination.resolve("LICENSE.md")));
 
     String changelog = Files.readString(destination.resolve("CHANGELOG.md"), StandardCharsets.UTF_8);
-    assertTrue(changelog.contains("Initial release of the Sample App project."));
+    List<String> entries = changelog.lines().filter(line -> line.startsWith("- ")).toList();
+    assertEquals(1, entries.size(), "expected one initial entry, found: " + entries);
+    assertTrue(entries.get(0).matches("- [A-Z][A-Za-z]+: \\S.*Sample App.*"),
+        "initial entry lacks an area prefix: " + entries.get(0));
 
     assertAll("fresh project metadata",
         () -> assertEquals(List.of("version=0.1.0-pre"),
