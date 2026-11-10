@@ -19,7 +19,10 @@ VENV_PYTHON = VENV_DIR / ("Scripts/python.exe" if sys.platform == "win32" else "
 if __name__ == "__main__" and VENV_PYTHON.is_file() and Path(sys.prefix).resolve() != VENV_DIR.resolve():
     sys.exit(subprocess.run([str(VENV_PYTHON), str(Path(__file__).resolve()), *sys.argv[1:]], check=False).returncode)
 
-from support_python.devops import DevopsCli, GradleProject  # noqa: E402
+try:
+    from support_python.devops import DevopsCli, GradleProject
+except ImportError as exc:
+    sys.exit(f"**[ERROR]** support-python v2 is missing ({exc}); run `python scripts/bootstrap-dev-environment.py` first.")
 
 
 def build_cli(root: Path = REPO_ROOT) -> DevopsCli:

@@ -182,5 +182,7 @@ resume a failed release without repeating the steps already done.
 
 ## Continuous Integration
 The GitHub Actions workflow in `.github/workflows/ci.yml` triggers on push and pull requests, executing:
-- Java JDK 25 setup.
-- `python3 scripts/devops.py check`, which runs `./gradlew build` (compilation, Spotless, Checkstyle, unit testing, packaging).
+- Java JDK 25 and Python 3 setup.
+- `python -m pip install -r scripts/requirements.txt`, installing support-python into the runner's Python, without a `.venv`.
+- `python -m unittest discover -s scripts/tests`, testing `scripts/devops.py` itself.
+- `python scripts/devops.py check`, which runs `./gradlew build` (compilation, Spotless, Checkstyle, unit testing, packaging).
