@@ -37,7 +37,9 @@ public final class Scaffold {
 
   // Tracked files only: plan data lives on the separate plan branch, so CI checkouts have no PLAN.md.
   private static final List<String> MARKER_FILES = List.of("build.gradle", "settings.gradle", "CHANGELOG.md");
-  // The template's plan store is not inherited; new projects start from a fresh PLAN.md and run `plan init`.
+  // The template's plan store is not inherited; new projects create their own with `plan init --store branch`.
+  // The root PLAN.md is an untracked link into .plan/, dangling when .plan/ is absent.
+  private static final Path PLAN_LINK = Path.of("PLAN.md");
   private static final Set<String> EXCLUDED_NAMES = Set.of(
       ".git", ".gradle", "build", "out", ".idea", ".vscode", ".venv", "work", "__pycache__", ".plan", "plan.code-workspace"
   );
@@ -104,6 +106,9 @@ public final class Scaffold {
     try (Stream<Path> walk = Files.walk(source)) {
       walk.forEach(path -> {
         Path relative = source.relativize(path);
+        if (relative.equals(PLAN_LINK)) {
+          return;
+        }
         for (Path part : relative) {
           if (EXCLUDED_NAMES.contains(part.toString()) || part.toString().endsWith(".egg-info")) {
             return; // Skip anything under an excluded directory.
@@ -192,23 +197,6 @@ public final class Scaffold {
     }
   }
 
-  private static void writeFreshPlanMd(Path destination) throws ScaffoldException {
-    String content = "# Project Planning\n"
-        + "An overview of all tasks and their planning.\n\n"
-        + "---\n\n"
-        + "## Next Milestone\n"
-        + "*(Currently no tasks)*\n\n"
-        + "---\n\n"
-        + "## Backlog\n"
-        + "*(Currently no tasks)*\n";
-    try {
-      Files.writeString(destination.resolve("PLAN.md"), content, StandardCharsets.UTF_8);
-    }
-    catch (IOException e) {
-      throw new ScaffoldException("Failed to write PLAN.md: " + e.getMessage());
-    }
-  }
-
   private static void resetGradlePropertiesVersion(Path destination) throws ScaffoldException {
     Path gradleProperties = destination.resolve("gradle.properties");
     try {
@@ -227,7 +215,7 @@ public final class Scaffold {
    * <p>Automates the manual steps documented in this template's README under "Starting a new project from
    * this template": copy the tree, rename the {@code myproject} package (in both {@code src/main} and
    * {@code src/test}), replace the {@code template.java} name placeholder
-   * throughout, and reset {@code CHANGELOG.md}, {@code PLAN.md}, and {@code gradle.properties}'s {@code version} -
+   * throughout, skip the template's plan store, and reset {@code CHANGELOG.md} and {@code gradle.properties}'s {@code version} -
    * the new project starts its own history rather than inheriting the template's.
    *
    * @param projectName name of the new project, also used for its directory
@@ -264,7 +252,6 @@ public final class Scaffold {
     ));
 
     writeFreshChangelogMd(destination, title);
-    writeFreshPlanMd(destination);
     resetGradlePropertiesVersion(destination);
 
     return destination;

@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
@@ -186,16 +187,13 @@ class CliTest {
     String changelog = Files.readString(destination.resolve("CHANGELOG.md"), StandardCharsets.UTF_8);
     assertTrue(changelog.contains("Initial release of the Sample App project."));
 
-    String plan = Files.readString(destination.resolve("PLAN.md"), StandardCharsets.UTF_8);
     assertAll("fresh project metadata",
         () -> assertEquals(List.of("version=0.1.0-pre"),
             gradleProperties.lines().filter(line -> line.startsWith("version=")).toList()),
         () -> assertEquals(List.of("## v0.1.0-pre"),
             changelog.lines().filter(line -> line.startsWith("## ")).toList()),
         () -> assertFalse(changelog.contains("[in development]")),
-        () -> assertEquals(List.of("## Next Milestone", "## Backlog"),
-            plan.lines().filter(line -> line.startsWith("##")).toList()),
-        () -> assertEquals(2L, plan.lines().filter(line -> line.equals("*(Currently no tasks)*")).count()),
+        () -> assertFalse(Files.exists(destination.resolve("PLAN.md"), LinkOption.NOFOLLOW_LINKS)),
         () -> assertFalse(Files.exists(destination.resolve(".plan"))),
         () -> assertFalse(Files.exists(destination.resolve("plan.code-workspace"))),
         () -> assertFalse(buildGradle.contains("hinolugi")),

@@ -130,9 +130,9 @@ Mainline is `main`.
 
 ## Scaffolding a New Project
 Generated projects start at `0.1.0-pre` in `gradle.properties`, with a matching `## v0.1.0-pre` changelog heading.
-Their fresh `PLAN.md` has empty Next Milestone and Backlog sections.
-`create` skips the template's `.plan/` store and `plan.code-workspace`, so run `plan init` in the new project.
-Use `plan init --store branch` to keep plan data on an orphan `plan` branch, as this template does.
+`create` skips the template's plan store: `PLAN.md`, `.plan/`, and `plan.code-workspace`.
+After the bootstrap has run `git init`, create the new project's store with `plan init --store branch`.
+It keeps plan data on an orphan `plan` branch, as the copied `.gitignore` expects.
 `create` finds the template root by `build.gradle`, `settings.gradle`, `CHANGELOG.md`, and `src/main/java/myproject/`.
 It needs no plan data, so it works in CI checkouts of `main`.
 

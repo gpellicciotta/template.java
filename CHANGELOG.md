@@ -12,11 +12,11 @@ A summarized overview of all changes, per version of this project.
 
 ---
 
-## v2.0.1-pre
+## v3.0.0-pre
 - CLI: Fixed `create` failing in checkouts without plan data, such as CI; it finds the root by `settings.gradle` instead of `PLAN.md`.
-- CLI: `create` now skips the template's `.plan/` store and `plan.code-workspace`; run `plan init` in the new project.
+- CLI: **Breaking:** `create` no longer writes `PLAN.md` and skips the template's plan store; run `plan init --store branch` in the new project.
 - DevEx: Replaced the hand-written [devops.py](scripts/devops.py) with a thin `DevopsCli` over support-python v2.0.0's `GradleProject`, adding `lint` and `format`.
-- DevEx: `devops.py test` now takes Gradle test patterns as arguments (`test myproject.CoreTest`) instead of `--tests`.
+- DevEx: **Breaking:** `devops.py test` now takes Gradle test patterns as arguments (`test myproject.CoreTest`) instead of `--tests`.
 - DevEx: The bootstrap installs `scripts/requirements.txt` into a project-local `.venv`; `devops.py` reruns itself there, and `create` skips `.venv`.
 - DevEx: CI installs `scripts/requirements.txt` and runs the new `scripts/tests` unittest suite before `devops.py check`.
 - DevEx: Removed the placeholder `scripts/deploy-to-production.py`; deployment belongs in `devops.py`, and this template deploys nothing.

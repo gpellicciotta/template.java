@@ -140,6 +140,6 @@ To do it by hand instead: copy this folder, then rename every occurrence of the 
 - This README's title, and `CLAUDE.md`'s placeholder sections
 - `CHANGELOG.md` — replace the version history with your project's initial `## v0.1.0-pre` entry
 - `gradle.properties`'s `version` — reset to `0.1.0-pre`
-- `PLAN.md` — reset to empty `## Next Milestone` and `## Backlog` sections, skip `.plan/`, and run `plan init` in the new project
+- `PLAN.md`, `.plan/`, and `plan.code-workspace` — leave them out, then run `plan init --store branch` in the new project
 
 Then follow **Quick Start** above to verify the rename didn't break anything before writing real code.
