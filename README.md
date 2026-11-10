@@ -43,7 +43,7 @@ template.java/
   LICENSE.md                # project license
   CHANGELOG.md              # versioned changes in reverse chronological order
   PLAN.md                   # task index link into .plan/, managed through the `plan` CLI
-  AGENTS.md                 # AI assistant pointer to the plan guidelines
+  AGENTS.md                 # instructions for AI coding agents
   .plan/                    # plan store: a worktree of the orphan `plan` branch (not on main)
   build.gradle              # JDK toolchain, JUnit 6, Checkstyle, Spotless, application plugin, jar manifest
   config/checkstyle/        # Checkstyle rules (Stroustrup braces, public API Javadoc, package-info)
@@ -56,7 +56,7 @@ template.java/
     devops.py                     # thin DevopsCli runner: check, lint, test, build, versions, release
     requirements.txt              # pins support-python for devops.py
     tests/                        # unittest tests of devops.py
-  CLAUDE.md                 # AI assistant guidance
+  CLAUDE.md                 # imports AGENTS.md for Claude Code
 ```
 
 `build/` is created by Gradle and should not be committed. Delete it with `Remove-Item -Recurse -Force build` when a clean rebuild is needed; the next Gradle command recreates the required directories.
@@ -138,7 +138,7 @@ Then bootstrap the new project and run `plan init --store branch` there to creat
 To do it by hand instead: copy this folder, then rename every occurrence of the placeholder names below:
 - `src/main/java/myproject/` and `src/test/java/myproject/` → `src/main/java/<your_package_name>/` and `src/test/java/<your_package_name>/` (and every `package myproject;`/`import myproject...` line inside them)
 - `settings.gradle`'s `rootProject.name = 'template.java'`
-- This README's title, and `CLAUDE.md`'s placeholder sections
+- This README's title, and the `[TODO]` sections of [AGENTS.md](AGENTS.md)
 - `CHANGELOG.md` — replace the version history with your project's initial `## v0.1.0-pre` entry
 - `gradle.properties`'s `version` — reset to `0.1.0-pre`
 - `PLAN.md`, `.plan/`, and `plan.code-workspace` — leave them out, then run `plan init --store branch` in the new project

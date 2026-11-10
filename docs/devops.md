@@ -52,9 +52,9 @@ Git treats `.png`, `.jpg`, `.jpeg`, `.gif`, `.ico`, `.pdf`, `.docx`, `.jar`, `.w
 The general `.jar` rule also protects the Gradle wrapper JAR.
 
 ### Deploying a Service
-This template ships as a standalone CLI jar with no production service, so `devops.py` has no `production`
-subcommand. Projects derived from this template that deploy a service should add one per the dev-guidelines
-CLI conventions.
+This template ships as a standalone CLI jar with no production service, so `devops.py` has no `deploy` action.
+Derived projects that deploy a service enable it with `DevopsCli.set_deploy` in `build_cli()`, keeping the deploy steps project-local.
+See the [CLI guidelines](https://github.com/gpellicciotta/dev-guidelines/blob/main/guidelines/cli-guidelines.md#devops-scripts).
 
 ### Operations Runner `devops.py`
 [devops.py](../scripts/devops.py) is the single entry point to typical operations; run `python scripts/devops.py help --verbose`.

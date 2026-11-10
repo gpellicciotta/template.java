@@ -20,6 +20,7 @@ A summarized overview of all changes, per version of this project.
 - DevEx: The bootstrap installs `scripts/requirements.txt` into a project-local `.venv`; `devops.py` reruns itself there, and `create` skips `.venv`.
 - DevEx: CI installs `scripts/requirements.txt` and runs the new `scripts/tests` unittest suite before `devops.py check`.
 - DevEx: Made `devops.py lint` and `check` run `lint-markdown check` first, excluding [CHANGELOG.md](CHANGELOG.md) via [.lint-markdown.json](.lint-markdown.json).
+- Docs: Moved agent instructions into [AGENTS.md](AGENTS.md) in the standard section order and reduced [CLAUDE.md](CLAUDE.md) to its import.
 - DevEx: Removed the placeholder `scripts/deploy-to-production.py`; deployment belongs in `devops.py`, and this template deploys nothing.
 
 ---

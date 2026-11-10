@@ -1,7 +1,7 @@
 # Publishing a reusable library (optional)
 
 This template ships as an application (`plugins { id 'application' }`), not a library, and deliberately does
-not include publishing configuration by default — see CLAUDE.md's "Favour simplicity over ingenuity". Add the
+not include publishing configuration by default, keeping it as simple as today's needs. Add the
 pattern below only if your project derived from this template is itself a reusable library consumed by other
 projects (e.g. `support.java`, consumed by `auth`).
 
