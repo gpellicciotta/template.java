@@ -9,4 +9,5 @@ An overview of all tasks and their planning.
 ---
 
 ## Backlog
+- [ ] T0032 Fix the nine pre-existing lint-markdown MD019 findings and run lint-markdown in devops.py check.
 - [x] T0030 Replace scripts/devops.py with a thin DevopsCli script on the GradleProject adapter, pinning the released support-python v2.0.0.
