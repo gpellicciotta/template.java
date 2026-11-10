@@ -82,7 +82,7 @@ It refuses to start without `-PreleaseConfirmed=yes`. It runs `build` (compile, 
 - `finalizeRelease` - strips `-pre` from [gradle.properties](../gradle.properties), marks the CHANGELOG heading
   `[released: {{date}}]`, and commits.
 - `publishReleaseArtifacts` - runs `publishMavenPublicationToGithubPackagesRepository` in a nested Gradle run if this
-  project has opted into `maven-publish` per [library-publishing.md](library-publishing.md); otherwise a no-op (this template ships
+  project has opted into `maven-publish` per [library-publishing.md](tutorials/library-publishing.md); otherwise a no-op (this template ships
   as an application, not a library).
 - `tagAndPushRelease` - tags the release commit `v{{version}}` and pushes the branch and tag to `origin`.
 - `createGithubRelease` - runs `gh release create` for the new tag, using the CHANGELOG section as notes.

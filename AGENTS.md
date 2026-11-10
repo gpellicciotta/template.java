@@ -31,7 +31,7 @@ Builds need GitHub Packages access; see the [environment prerequisites](docs/dev
 - [scripts/](scripts/): the bootstrap and the thin [devops.py](scripts/devops.py) runner on support-python.
 - [gradle/](gradle/): the version catalog, the wrapper, and the [release.gradle](gradle/release.gradle) `doFullRelease` pipeline.
 - [config/checkstyle/](config/checkstyle/): Checkstyle rules for braces, Javadoc, and [package-info.java](src/main/java/myproject/package-info.java).
-- [docs/](docs/): requirements, devops procedures, and the [multi-module](docs/multi-module.md) and [library publishing](docs/library-publishing.md) guides.
+- [docs/](docs/): requirements, devops procedures, and the [multi-module](docs/tutorials/multi-module.md) and [library publishing](docs/tutorials/library-publishing.md) guides.
 - **[TODO]** Describe each package a scaffolded project adds, one line each, naming what it must keep true.
 
 ## Project Conventions

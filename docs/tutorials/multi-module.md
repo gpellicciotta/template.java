@@ -106,8 +106,8 @@ test {
 }
 ```
 
-Keep the JUnit versions together here, aligned with the template's [build configuration](../build.gradle).
-Keep Java 25 aligned with the wrapper's [daemon toolchain](../gradle/gradle-daemon-jvm.properties) and CI.
+Keep the JUnit versions together here, aligned with the template's [build configuration](../../build.gradle).
+Keep Java 25 aligned with the wrapper's [daemon toolchain](../../gradle/gradle-daemon-jvm.properties) and CI.
 The shared defaults retain test output streaming, source archives, and HTML5 Javadoc with quiet output and disabled doclint.
 Each Java subproject's `build` produces its main jar, `-sources.jar`, and `-javadoc.jar` under its own `build/libs/`.
 
@@ -170,10 +170,10 @@ Keep module-specific dependencies and packaging in each module's build file.
 
 ## Migrate and verify
 - Move production code, tests, and resources into the owning module's standard `src/main` and `src/test` trees.
-- Keep the wrapper, daemon toolchain, and shared [gradle.properties](../gradle.properties) at the root.
+- Keep the wrapper, daemon toolchain, and shared [gradle.properties](../../gradle.properties) at the root.
 - Move shared repository configuration into common, including private repositories needed by your dependencies.
 - Preserve manifest metadata, formatting checks, and release wiring from the root build in the appropriate module or convention.
-- Keep root [build.gradle](../build.gradle) only for required build-wide tasks; remove Java application configuration after moving its sources.
+- Keep root [build.gradle](../../build.gradle) only for required build-wide tasks; remove Java application configuration after moving its sources.
 - Update CI, launch commands, and release artifact paths to the module outputs.
 
 Run these commands from the build root after adding source files and tests:

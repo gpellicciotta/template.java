@@ -23,8 +23,9 @@ template.java/
     index.md                # documentation index
     requirements.md         # functional and technical requirements
     devops.md               # environment, versioning and releasing, workflows, and CI
-    multi-module.md         # design note for multi-module Gradle builds
-    library-publishing.md   # optional maven-publish setup for GitHub Packages
+    tutorials/              # step-by-step how-to guides
+      multi-module.md       # multi-module Gradle builds
+      library-publishing.md # optional maven-publish setup for GitHub Packages
   build/                    # generated Gradle output; ignored by Git
     classes/                # compiled main and test classes
     generated/              # generated source and header files

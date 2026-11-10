@@ -7,7 +7,7 @@ import groovy.json.JsonSlurper
 // The pipeline publishes to a shared package repository and pushes to origin, so it refuses to start without
 // -PreleaseConfirmed=yes (scripts/devops.py release asks for that confirmation and passes it along).
 //
-// Publishing is opt-in per docs/library-publishing.md - this template ships as an application, not a library,
+// Publishing is opt-in per docs/tutorials/library-publishing.md - this template ships as an application, not a library,
 // so by default no `publishMavenPublicationToGithubPackagesRepository` task exists and publishReleaseArtifacts
 // skips. When it runs, it uses a nested Gradle invocation, because the release version (without -pre) is only written to
 // gradle.properties during this run, after this invocation has already resolved project.version.
@@ -127,7 +127,7 @@ tasks.register('publishReleaseArtifacts') {
   dependsOn 'finalizeRelease'
   doLast {
     if (tasks.findByName('publishMavenPublicationToGithubPackagesRepository') == null) {
-      logger.lifecycle('No GithubPackages maven publication configured - skipping publish (see docs/library-publishing.md).')
+      logger.lifecycle('No GithubPackages maven publication configured - skipping publish (see docs/tutorials/library-publishing.md).')
       return
     }
     def gradlew = file(System.getProperty('os.name').toLowerCase().contains('win') ? 'gradlew.bat' : 'gradlew').absolutePath
