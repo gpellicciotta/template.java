@@ -199,7 +199,10 @@ class CliTest {
         () -> assertTrue(Files.isDirectory(destination.resolve(".plan/protocols"))),
         () -> assertFalse(Files.exists(destination.resolve(".plan/tasks"))),
         () -> assertFalse(buildGradle.contains("hinolugi")),
-        () -> assertFalse(Files.exists(destination.resolve("TODO.md"))));
+        () -> assertFalse(Files.exists(destination.resolve("TODO.md"))),
+        () -> assertTrue(Files.isRegularFile(destination.resolve("scripts/requirements.txt"))),
+        () -> assertTrue(Files.isRegularFile(destination.resolve("scripts/tests/test_devops.py"))),
+        () -> assertFalse(Files.exists(destination.resolve(".venv"))));
 
     assertTrue(Files.isRegularFile(destination.resolve("docs/index.md")));
     assertTrue(Files.isRegularFile(destination.resolve("docs/requirements.md")));

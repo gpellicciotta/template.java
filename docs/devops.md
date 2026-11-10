@@ -9,7 +9,8 @@ Practical guidance on building, testing, developing, and releasing for `template
 - **Gradle**: Gradle 9.x (managed via the included Gradle wrapper `./gradlew` / `gradlew.bat`).
 - **Git**: Git 2.30+ supporting worktrees (`git worktree`).
 - **PowerShell / Bash**: PowerShell on Windows, standard POSIX shell on macOS/Linux.
-- **Python**: Python 3 for `scripts/bootstrap-dev-environment.py` and `scripts/devops.py` (standard library only).
+- **Python**: Python 3.9+ for [bootstrap-dev-environment.py](../scripts/bootstrap-dev-environment.py) (standard library only) and [devops.py](../scripts/devops.py).
+  `devops.py` runs on [support-python](https://github.com/gpellicciotta/support.python), pinned in `scripts/requirements.txt`.
 - **GitHub Packages access**: `build.gradle` depends on `com.pellicciotta:support.java`, hosted on the
   `gpellicciotta/support.java` GitHub Packages repo. Local builds need a GitHub PAT with `read:packages`
   set as `github.token` (and `github.username`) in `{user.home}/.gradle/gradle.properties`, or the
@@ -25,7 +26,10 @@ Clone the repository and run the bootstrap script:
 ```shell
 python scripts/bootstrap-dev-environment.py
 ```
-This initializes a git repo (if one doesn't already exist) and runs `gradlew build`.
+This initializes a git repo (if one doesn't already exist), then creates `.venv` and installs `scripts/requirements.txt` into it.
+It then runs `gradlew build`.
+A project-local `.venv` keeps the pinned support-python apart from other projects pinning other versions.
+Rerun the bootstrap after changing `scripts/requirements.txt`.
 
 ### VS Code Workspace Settings
 The shared [.vscode/settings.json](../.vscode/settings.json) enables automatic Java build configuration updates.
@@ -54,13 +58,22 @@ CLI conventions.
 
 ### Operations Runner `devops.py`
 `scripts/devops.py` is the single entry point to typical operations; run `python scripts/devops.py help --verbose`.
+It is a thin `DevopsCli` over a `GradleProject` from support-python's `support_python.devops`.
+When `.venv` exists, it reruns itself with the `.venv` interpreter, so plain `python` works.
 
 ```shell
-python scripts/devops.py check      # every CI validation step: Spotless, Checkstyle, tests, jars
-python scripts/devops.py test --tests myproject.CoreTest
+python scripts/devops.py check      # every CI validation step: gradlew build (Spotless, Checkstyle, tests, jars)
+python scripts/devops.py lint       # spotlessCheck, checkstyleMain, checkstyleTest
+python scripts/devops.py format     # spotlessApply
+python scripts/devops.py test myproject.CoreTest   # each selection becomes a Gradle --tests filter
 python scripts/devops.py versions   # fail when gradle.properties and CHANGELOG.md versions drift apart
 python scripts/devops.py release --dry-run
 ```
+
+Add project-specific actions in `build_cli()` with `cli.add_action(name, summary, handler)`.
+See support-python's [DevOps scripts tutorial](https://github.com/gpellicciotta/support.python/blob/v2.0.0/docs/tutorials/devops-scripts.md).
+Test the script itself with `.venv/Scripts/python -m unittest discover -s scripts/tests` (`.venv/bin/python` outside Windows).
+CI installs `scripts/requirements.txt`, runs those tests, then runs `python scripts/devops.py check`.
 
 ### Building and Testing
 The root [gradle.properties](../gradle.properties) defines shared build defaults:
@@ -138,7 +151,8 @@ Ongoing work accumulates under the top `CHANGELOG.md` heading while it carries a
 ### Releasing with `devops.py`
 ```shell
 python scripts/devops.py release --dry-run   # list the pipeline tasks only
-python scripts/devops.py release             # asks for a typed confirmation, then runs doFullRelease
+python scripts/devops.py release             # asks for a typed confirmation, then runs doFullRelease -PreleaseConfirmed=yes
+python scripts/devops.py release --yes       # skips the typed confirmation
 ```
 
 The release pushes to `origin` and creates a GitHub release, so it only runs on explicit request.

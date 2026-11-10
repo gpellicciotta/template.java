@@ -52,8 +52,10 @@ template.java/
   .gitignore
   .editorconfig             # indent/charset/line-ending settings
   scripts/
-    bootstrap-dev-environment.py  # one-shot bootstrap: git init, gradlew build
-    devops.py                     # CI-equivalent checks, build, test, versions, release
+    bootstrap-dev-environment.py  # one-shot bootstrap: git init, .venv with support-python, gradlew build
+    devops.py                     # thin DevopsCli runner: check, lint, test, build, versions, release
+    requirements.txt              # pins support-python for devops.py
+    tests/                        # unittest tests of devops.py
   CLAUDE.md                 # AI assistant guidance
 ```
 
@@ -73,7 +75,7 @@ Open a shell in the project root and run:
 python scripts/bootstrap-dev-environment.py
 ```
 
-This initializes a git repo (if one doesn't already exist) and runs `gradlew build`, which compiles the code, checks formatting and style, runs the test suite, and produces a jar in `build/libs/`.
+This initializes a git repo (if one doesn't already exist), installs `scripts/requirements.txt` into `.venv`, and runs `gradlew build`, which compiles the code, checks formatting and style, runs the test suite, and produces a jar in `build/libs/`.
 
 ## Running Tests
 ```powershell
@@ -81,6 +83,7 @@ This initializes a git repo (if one doesn't already exist) and runs `gradlew bui
 ```
 
 `python scripts/devops.py check` runs every CI validation step (Spotless, Checkstyle, tests, jar assembly).
+`python scripts/devops.py test myproject.CoreTest` narrows the run to one class or method pattern.
 
 ## CLI
 ```powershell

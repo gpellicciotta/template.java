@@ -20,10 +20,11 @@ The Gradle wrapper pins Gradle; `build.gradle`'s `java.toolchain` pins the JDK, 
 The cross-platform bootstrap requires Python 3 and Git and runs the wrapper's full build.
 See [environment prerequisites](docs/devops.md#prerequisites-and-environment) for required GitHub Packages access.
 
-- One-shot bootstrap: `python scripts/bootstrap-dev-environment.py` initializes Git when needed and runs the full Gradle build.
+- One-shot bootstrap: `python scripts/bootstrap-dev-environment.py` initializes Git when needed, installs `scripts/requirements.txt` into `.venv`, and runs the full Gradle build.
 - Build + test + jar: `.\gradlew.bat build`
 - Run the CLI: `.\gradlew.bat run --args="<command> [args]"` or `java -jar build/libs/<name>-<version>.jar <command> [args]` after building.
-- Run the test suite only: `.\gradlew.bat test`
+- Run the test suite only: `.\gradlew.bat test`, or `python scripts/devops.py test myproject.CoreTest` for a selection.
+- Test [devops.py](scripts/devops.py) itself: `.venv/Scripts/python -m unittest discover -s scripts/tests`.
 - Run every CI validation step (Spotless, Checkstyle, tests, jars): `python scripts/devops.py check`
 - Release: `python scripts/devops.py release` runs the `doFullRelease` pipeline (pushes, creates a GitHub release). **Never run it unless the user explicitly asks.**
 - **[TODO]** Add any other project-specific commands here.

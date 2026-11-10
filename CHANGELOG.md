@@ -13,6 +13,10 @@ A summarized overview of all changes, per version of this project.
 ---
 
 ## v2.0.1-pre
+- DevEx: Replaced the hand-written [devops.py](scripts/devops.py) with a thin `DevopsCli` over support-python v2.0.0's `GradleProject`, adding `lint` and `format`.
+- DevEx: `devops.py test` now takes Gradle test patterns as arguments (`test myproject.CoreTest`) instead of `--tests`.
+- DevEx: The bootstrap installs `scripts/requirements.txt` into a project-local `.venv`; `devops.py` reruns itself there, and `create` skips `.venv`.
+- DevEx: CI installs `scripts/requirements.txt` and runs the new `scripts/tests` unittest suite before `devops.py check`.
 - DevEx: Removed the placeholder `scripts/deploy-to-production.py`; deployment belongs in `devops.py`, and this template deploys nothing.
 
 ---

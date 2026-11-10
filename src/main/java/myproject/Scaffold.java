@@ -39,7 +39,7 @@ public final class Scaffold {
   // The template's own planning history (tasks, work files) is not inherited by new projects.
   private static final List<Path> EXCLUDED_PATHS = List.of(Path.of(".plan", "tasks"), Path.of(".plan", "work"));
   private static final Set<String> EXCLUDED_NAMES = Set.of(
-      ".git", ".gradle", "build", "out", ".idea", ".vscode", "work", "__pycache__"
+      ".git", ".gradle", "build", "out", ".idea", ".vscode", ".venv", "work", "__pycache__"
   );
 
   /**
