@@ -1,15 +1,16 @@
 ---
 id: T0034
-owner: ~
-needs: ['T0033']
+owner: "@claude-code"
+needs: []
 branch: —
 worktree: —
-status: ready
-started_at: —
-ended_at: —
+status: completed
+started_at: "2026-11-10T16:33:10Z"
+ended_at: "2026-11-10T16:39:32Z"
 review: none
 preview: none
 protocol: adhoc
+completion-commit: 15cecc13534a1b233f19b4dcc22fdc1348195cf4
 ---
 # T0034: Restructure devops.md into the v2 section layout, sync the README layout, and fix paths and placeholders
 
@@ -32,13 +33,35 @@ Size estimate: 5 files, 250 lines
 - CHANGELOG.md
 
 ## Task Execution Steps
-- [ ] **[Read]**      Read the project-setup devops.md section rules and the general placeholder and path rules.
-- [ ] **[Doc]**       Reorder devops.md sections and add the Updating Versions and Making a Release content.
-- [ ] **[Doc]**       Replace absolute paths and old-style placeholders, and fix links to renamed anchors.
-- [ ] **[Doc]**       Sync the README directory layout with git ls-files output.
-- [ ] **[Doc]**       Add a Docs entry under the active CHANGELOG.md heading.
-- [ ] **[Verify]**    Run lint-markdown on README.md, docs, and AGENTS.md.
+- [x] **[Read]**      Read the project-setup devops.md section rules and the general placeholder and path rules.
+- [x] **[Doc]**       Reorder devops.md sections and add the Updating Versions and Making a Release content.
+- [x] **[Doc]**       Replace absolute paths and old-style placeholders, and fix links to renamed anchors.
+- [x] **[Doc]**       Sync the README directory layout with git ls-files output.
+- [x] **[Doc]**       Add a Docs entry under the active CHANGELOG.md heading.
+- [x] **[Verify]**    Run lint-markdown on README.md, docs, and AGENTS.md.
 
 ## Execution Log
 - [2026-11-10] **[Doc]**
   Companion task file scaffolded at task creation.
+
+- [2026-11-10] **[Doc]**
+  Reordered devops.md to open with Development Environment and Versioning and Releasing, adding Updating Versions and step-by-step Making a Release.
+
+- [2026-11-10] **[Decided]**
+  Documented that plan bumps only pyproject.toml, since lifecycle.bump_project_version ignores gradle.properties; openNextPreRelease raises the patch here.
+
+- [2026-11-10] **[Doc]**
+  Converted old-style placeholders to kebab-case mustache, replaced absolute create paths, and pointed links at the renamed anchors.
+
+- [2026-11-10] **[Doc]**
+  Synced the README layout with tracked files and added a Docs entry to the active CHANGELOG.md heading.
+
+- [2026-11-10] **[Verify]**
+  Recorded task outcomes; lint-markdown and devops.py check passed.
+  - Files touched: 5.
+  - Lines touched: 166.
+  - Reopenings: 0.
+
+- [2026-11-10] **[Complete]**
+  Task completed successfully.
+
