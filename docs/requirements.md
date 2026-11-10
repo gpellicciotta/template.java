@@ -27,8 +27,8 @@ Functional and technical requirements for the `template.java` project.
 - Ensure core business logic remains independent of console streams, exit calls, or CLI frameworks for seamless unit testing.
 
 ### Project Scaffolding
-- Automate repository renaming, package restructuring, and fresh metadata in `CHANGELOG.md` and `gradle.properties`.
-- Initialize `gradle.properties` at `0.1.0-pre`, with a matching `## v0.1.0-pre` changelog heading.
+- Automate repository renaming, package restructuring, and fresh metadata in [CHANGELOG.md](../CHANGELOG.md) and [gradle.properties](../gradle.properties).
+- Initialize [gradle.properties](../gradle.properties) at `0.1.0-pre`, with a matching `## v0.1.0-pre` changelog heading.
 - Leave out the template's plan store (`PLAN.md`, `.plan/`, `plan.code-workspace`); new projects run `plan init --store branch`.
 - Find the template root from files tracked on `main`, so `create` works in checkouts without plan data.
 - Prevent accidental overwrite when target directories already exist.
@@ -44,17 +44,17 @@ Functional and technical requirements for the `template.java` project.
 ---
 
 ## Technical Requirements
-- **Java Version**: Explicitly targeted and compiled with Java 25 toolchain (`java.toolchain`).
-- **Build System**: Gradle with pinned Gradle wrapper (`gradlew` / `gradlew.bat`).
-- **Build Defaults**: Enable build caching, all warnings, rich console output, and info logging through root Gradle properties.
-- **Ownership Metadata**: Declare author and a literal copyright notice in `gradle.properties` for derived projects.
-- **Testing**: JUnit 6 Jupiter test framework with JUnit platform launcher.
-- **Packaging**: Standard application plugin configuration generating runnable jar archives with manifest attributes (`Main-Class`, `Implementation-Title`, `Implementation-Version`, `Implementation-Vendor`).
-- **Build Timestamp**: Stamp the application JAR with `Build-Time` as an ISO-8601 UTC configuration timestamp by default.
-- **Reproducibility Tradeoff**: Accept changing application archives and repeated packaging while preserving caching for other eligible tasks.
-- **Companion Archives**: Generate source and Javadoc jars during `build`, including subprojects using the documented common convention.
-- **Javadoc**: Generate HTML5 documentation with doclint disabled and quiet output; retain failure on Javadoc errors.
-- **Static Checks**: Spotless (whitespace) and Checkstyle (Stroustrup braces, braces on every control block, public API Javadoc, `package-info.java`) run as part of `build`.
-- **Dependency Versions**: Declare all dependency and plugin versions centrally in [libs.versions.toml](../gradle/libs.versions.toml).
-- **Code Standards**: 2-space indentation, UTF-8 encoding, US English, and LF line endings except CRLF for `.bat` and `.cmd` scripts.
-- **Binary Assets**: Declare common image, document, Java archive, compiled class, and font formats as binary in Git attributes.
+- Target and compile with the Java 25 toolchain (`java.toolchain`).
+- Build with Gradle through the pinned wrapper ([gradlew](../gradlew) / [gradlew.bat](../gradlew.bat)).
+- Enable build caching, all warnings, rich console output, and info logging through root Gradle properties.
+- Declare author and a literal copyright notice in [gradle.properties](../gradle.properties) for derived projects.
+- Test with the JUnit 6 Jupiter framework and the JUnit platform launcher.
+- Generate runnable jar archives through the standard application plugin, with manifest attributes (`Main-Class`, `Implementation-Title`, `Implementation-Version`, `Implementation-Vendor`).
+- Stamp the application JAR with `Build-Time` as an ISO-8601 UTC configuration timestamp by default.
+- Accept that this timestamp changes application archives and repeats packaging, while other eligible tasks keep caching.
+- Generate source and Javadoc jars during `build`, including subprojects using the documented common convention.
+- Generate HTML5 Javadoc with doclint disabled and quiet output; retain failure on Javadoc errors.
+- Run Spotless (whitespace) and Checkstyle (Stroustrup braces, braces on every control block, public API Javadoc, [package-info.java](../src/main/java/myproject/package-info.java)) as part of `build`.
+- Declare all dependency and plugin versions centrally in [libs.versions.toml](../gradle/libs.versions.toml).
+- Use 2-space indentation, UTF-8 encoding, US English, and LF line endings except CRLF for `.bat` and `.cmd` scripts.
+- Declare common image, document, Java archive, compiled class, and font formats as binary in [.gitattributes](../.gitattributes).

@@ -13,6 +13,7 @@ A summarized overview of all changes, per version of this project.
 ---
 
 ## v3.0.0-pre
+- Docs: Replaced bold bullet labels with plain bullets and linked repository file names in the README, agent instructions, and docs.
 - Docs: Restructured [devops.md](docs/devops.md) to open with environment, versioning, and release steps, and adopted `{{kebab-case}}` placeholders across the docs.
 - CLI: Gave the initial changelog entry that `create` writes a `DevEx:` area prefix and past-tense wording.
 - CLI: Fixed `create` failing without plan data, as in CI, by finding the root via [build.gradle](build.gradle), [settings.gradle](settings.gradle), and [CHANGELOG.md](CHANGELOG.md).

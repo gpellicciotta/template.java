@@ -15,7 +15,7 @@ See [README.md](README.md), [requirements.md](docs/requirements.md), and [devops
 Use `.\gradlew.bat` in Windows PowerShell and `./gradlew` in POSIX shells.
 Builds need GitHub Packages access; see the [environment prerequisites](docs/devops.md#prerequisites).
 
-- Bootstrap: `python scripts/bootstrap-dev-environment.py` initializes Git, fills `.venv` from `scripts/requirements.txt`, and builds.
+- Bootstrap: `python scripts/bootstrap-dev-environment.py` initializes Git, fills `.venv` from [requirements.txt](scripts/requirements.txt), and builds.
 - Fast tests: `.\gradlew.bat test`, or `python scripts/devops.py test myproject.CoreTest` for a selection.
 - Script tests: `.venv/Scripts/python -m unittest discover -s scripts/tests`.
 - All checks (Markdown lint, Spotless, Checkstyle, tests, jars): `python scripts/devops.py check`.
@@ -30,16 +30,16 @@ Builds need GitHub Packages access; see the [environment prerequisites](docs/dev
   - `Scaffold`: the template-only `create` command; derived projects may delete it.
 - [scripts/](scripts/): the bootstrap and the thin [devops.py](scripts/devops.py) runner on support-python.
 - [gradle/](gradle/): the version catalog, the wrapper, and the [release.gradle](gradle/release.gradle) `doFullRelease` pipeline.
-- [config/checkstyle/](config/checkstyle/): Checkstyle rules for braces, Javadoc, and `package-info.java`.
+- [config/checkstyle/](config/checkstyle/): Checkstyle rules for braces, Javadoc, and [package-info.java](src/main/java/myproject/package-info.java).
 - [docs/](docs/): requirements, devops procedures, and the [multi-module](docs/multi-module.md) and [library publishing](docs/library-publishing.md) guides.
 - **[TODO]** Describe each package a scaffolded project adds, one line each, naming what it must keep true.
 
 ## Project Conventions
 - Style: 2-space indentation, UTF-8, and LF line endings, except CRLF for `.bat` and `.cmd` files.
   [.editorconfig](.editorconfig), Spotless, and Checkstyle enforce it.
-- Versions: [gradle.properties](gradle.properties) holds the authoritative `version`, matching the top `CHANGELOG.md` heading.
+- Versions: [gradle.properties](gradle.properties) holds the authoritative `version`, matching the top [CHANGELOG.md](CHANGELOG.md) heading.
   [build.gradle](build.gradle) stamps it into the jar manifest with `+{{commit}}` metadata, and `Cli.version()` reads it back.
-- Deployment: this template deploys nothing; derived projects enable `deploy` with `DevopsCli.set_deploy` in devops.py.
+- Deployment: this template deploys nothing; derived projects enable `deploy` with `DevopsCli.set_deploy` in [devops.py](scripts/devops.py).
 - Scaffolding: keep `Scaffold`'s marker files, the `template.java` name placeholder, and its skipped paths in sync with the layout.
   Markers must be files tracked on `main`, because plan data lives on the `plan` branch and CI lacks it.
   `CliTest` and `ScaffoldTest` cover `create`.
@@ -47,6 +47,6 @@ Builds need GitHub Packages access; see the [environment prerequisites](docs/dev
 
 ## Boundaries
 - Never run `python scripts/devops.py release` or `doFullRelease` unless the user explicitly asks; both push and publish.
-- Never edit finalized `CHANGELOG.md` sections; only their heading status tags may change.
+- Never edit finalized [CHANGELOG.md](CHANGELOG.md) sections; only their heading status tags may change.
 - Never commit GitHub Packages credentials; they belong in the user's Gradle properties or environment.
 - Never add `.plan/` or `PLAN.md` to `main`; plan data lives on the `plan` branch.

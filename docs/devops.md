@@ -7,31 +7,34 @@ Practical guidance on building, testing, developing, and releasing for `template
 ## Development Environment
 
 ### Prerequisites
-- **JDK**: Java 25 (auto-provisioned by Gradle toolchain if not present locally).
-- **Gradle**: Gradle 9.x (managed via the included Gradle wrapper `./gradlew` / `gradlew.bat`).
-- **Git**: Git 2.30+ supporting worktrees (`git worktree`).
-- **PowerShell / Bash**: PowerShell on Windows, standard POSIX shell on macOS/Linux.
-- **Python**: Python 3.9+ for [bootstrap-dev-environment.py](../scripts/bootstrap-dev-environment.py) (standard library only) and [devops.py](../scripts/devops.py).
-  `devops.py` runs on [support-python](https://github.com/gpellicciotta/support.python), pinned in `scripts/requirements.txt`.
-- **GitHub Packages access**: `build.gradle` depends on `com.pellicciotta:support.java`, hosted on the
+- Java 25 JDK, auto-provisioned by the Gradle toolchain if not present locally.
+- Gradle 9.x, managed through the included wrapper ([gradlew](../gradlew) / [gradlew.bat](../gradlew.bat)).
+- Git 2.30+ supporting worktrees (`git worktree`).
+- PowerShell on Windows, or a standard POSIX shell on macOS/Linux.
+
+- Python 3.9+ for [bootstrap-dev-environment.py](../scripts/bootstrap-dev-environment.py) (standard library only) and [devops.py](../scripts/devops.py).
+  The latter runs on [support-python](https://github.com/gpellicciotta/support.python), pinned in [requirements.txt](../scripts/requirements.txt).
+
+- GitHub Packages access: [build.gradle](../build.gradle) depends on `com.pellicciotta:support.java`, hosted on the
   `gpellicciotta/support.java` GitHub Packages repo. Local builds need a GitHub PAT with `read:packages`
   set as `github.token` (and `github.username`) in `{{user-home}}/.gradle/gradle.properties`, or the
   `GITHUB_USERNAME`/`GITHUB_TOKEN` env vars. CI reads the PAT from the `PACKAGES_TOKEN` repo secret.
-- **Dependency versions**: All dependency and plugin versions live in [libs.versions.toml](../gradle/libs.versions.toml).
+
+- All dependency and plugin versions live in [libs.versions.toml](../gradle/libs.versions.toml).
 
 ### Setup
 Clone the repository and run the bootstrap script:
 ```shell
 python scripts/bootstrap-dev-environment.py
 ```
-This initializes a git repo (if one doesn't already exist), then creates `.venv` and installs `scripts/requirements.txt` into it.
+This initializes a git repo (if one doesn't already exist), then creates `.venv` and installs [requirements.txt](../scripts/requirements.txt) into it.
 It then runs `gradlew build`.
 A project-local `.venv` keeps the pinned support-python apart from other projects pinning other versions.
-Rerun the bootstrap after changing `scripts/requirements.txt`.
+Rerun the bootstrap after changing [requirements.txt](../scripts/requirements.txt).
 
 The shared [.vscode/settings.json](../.vscode/settings.json) enables automatic Java build configuration updates.
 Keep shared settings portable; configure machine-specific JDK paths and personal preferences in VS Code user settings.
-Other files and directories under `.vscode/` remain ignored by default, including in nested modules.
+Other files and directories under [.vscode/](../.vscode/) remain ignored by default, including in nested modules.
 
 ---
 
@@ -46,15 +49,15 @@ The top [CHANGELOG.md](../CHANGELOG.md) heading must match it exactly, `-pre` su
 Bump the version as part of the change that requires it:
 - Breaking change: raise the major version and reset minor and patch, unless the `-pre` version already did.
 - New functionality: raise the minor version and reset the patch, unless the `-pre` version already did.
-- Rename `version` and the top `CHANGELOG.md` heading together, in the same commit as the change.
+- Rename `version` and the top [CHANGELOG.md](../CHANGELOG.md) heading together, in the same commit as the change.
 
-`plan` task completion raises the patch of Python projects in `pyproject.toml`, but it does not read `gradle.properties` yet.
+`plan` task completion raises the patch of Python projects in `pyproject.toml`, but it does not read [gradle.properties](../gradle.properties).
 In this project, the release pipeline's `openNextPreRelease` step raises the patch instead.
 Run `python scripts/devops.py versions` to fail fast when the two versions drift apart.
 
 ### Making a Release
 A release pushes to `origin` and creates a GitHub release, so it only runs on explicit request.
-1. Confirm every change of the version is recorded under the top `-pre` heading of `CHANGELOG.md`.
+1. Confirm every change of the version is recorded under the top `-pre` heading of [CHANGELOG.md](../CHANGELOG.md).
 2. Run `python scripts/devops.py versions` and `python scripts/devops.py check`, and fix any failure.
 3. Commit and push `main`, then wait until CI on `origin/main` is green.
 4. Authenticate the [GitHub CLI](https://cli.github.com/) with `gh auth login`, if not done yet.
@@ -74,17 +77,17 @@ python scripts/devops.py release --yes       # skips the typed confirmation
 .\gradlew.bat doFullRelease -PreleaseConfirmed=yes
 ```
 It refuses to start without `-PreleaseConfirmed=yes`. It runs `build` (compile, Spotless, Checkstyle, tests), then in order:
-- `checkReleasePreconditions` - fails unless confirmed, the tree is clean, the branch is `main`, `CHANGELOG.md`
+- `checkReleasePreconditions` - fails unless confirmed, the tree is clean, the branch is `main`, [CHANGELOG.md](../CHANGELOG.md)
   has a matching un-released heading, `gh` is authenticated, and HEAD equals `origin/main` with green CI.
-- `finalizeRelease` - strips `-pre` from `gradle.properties`, marks the CHANGELOG heading
+- `finalizeRelease` - strips `-pre` from [gradle.properties](../gradle.properties), marks the CHANGELOG heading
   `[released: {{date}}]`, and commits.
 - `publishReleaseArtifacts` - runs `publishMavenPublicationToGithubPackagesRepository` in a nested Gradle run if this
   project has opted into `maven-publish` per [library-publishing.md](library-publishing.md); otherwise a no-op (this template ships
   as an application, not a library).
 - `tagAndPushRelease` - tags the release commit `v{{version}}` and pushes the branch and tag to `origin`.
 - `createGithubRelease` - runs `gh release create` for the new tag, using the CHANGELOG section as notes.
-- `openNextPreRelease` - bumps `gradle.properties` to the next patch `-pre` version, opens a matching
-  `CHANGELOG.md` heading, and commits and pushes.
+- `openNextPreRelease` - bumps [gradle.properties](../gradle.properties) to the next patch `-pre` version, opens a matching
+  [CHANGELOG.md](../CHANGELOG.md) heading, and commits and pushes.
 
 Any individual step can also be run on its own (e.g. `.\gradlew.bat checkReleasePreconditions`) to diagnose or
 resume a failed release without repeating the steps already done.
@@ -101,7 +104,7 @@ Ignore rules do not remove files already tracked by Git.
 
 ### Line Endings and Binary Assets
 [.gitattributes](../.gitattributes) normalizes text to LF in Git and checks out `.bat` and `.cmd` scripts with CRLF.
-Shell scripts (`.sh`) and `gradlew` use LF; `gradlew.bat` uses CRLF.
+Shell scripts (`.sh`) and [gradlew](../gradlew) use LF; [gradlew.bat](../gradlew.bat) uses CRLF.
 [.editorconfig](../.editorconfig) applies matching line endings when saving scripts in compatible editors.
 
 Git treats `.png`, `.jpg`, `.jpeg`, `.gif`, `.ico`, `.pdf`, `.docx`, `.jar`, `.war`, `.class`,
@@ -109,7 +112,7 @@ Git treats `.png`, `.jpg`, `.jpeg`, `.gif`, `.ico`, `.pdf`, `.docx`, `.jar`, `.w
 The general `.jar` rule also protects the Gradle wrapper JAR.
 
 ### Deploying a Service
-This template ships as a standalone CLI jar with no production service, so `devops.py` has no `deploy` action.
+This template ships as a standalone CLI jar with no production service, so [devops.py](../scripts/devops.py) has no `deploy` action.
 Derived projects that deploy a service enable it with `DevopsCli.set_deploy` in `build_cli()`, keeping the deploy steps project-local.
 See the [CLI guidelines](https://github.com/gpellicciotta/dev-guidelines/blob/main/guidelines/cli-guidelines.md#devops-scripts).
 
@@ -128,11 +131,11 @@ python scripts/devops.py release --dry-run
 ```
 
 `lint` and `check` run `lint-markdown check` first and stop when it fails.
-[.lint-markdown.json](../.lint-markdown.json) adds `CHANGELOG.md`, whose finalized entries must stay unedited, to lint-markdown's default excludes.
+[.lint-markdown.json](../.lint-markdown.json) adds [CHANGELOG.md](../CHANGELOG.md), whose finalized entries must stay unedited, to lint-markdown's default excludes.
 Add project-specific actions in `build_cli()` with `cli.add_action(name, summary, handler)`.
 See support-python's [DevOps scripts tutorial](https://github.com/gpellicciotta/support.python/blob/v2.0.0/docs/tutorials/devops-scripts.md).
 Test the script itself with `.venv/Scripts/python -m unittest discover -s scripts/tests` (`.venv/bin/python` outside Windows).
-CI installs `scripts/requirements.txt`, runs those tests, then runs `python scripts/devops.py check`.
+CI installs [requirements.txt](../scripts/requirements.txt), runs those tests, then runs `python scripts/devops.py check`.
 
 ### Building and Testing
 The root [gradle.properties](../gradle.properties) defines shared build defaults:
@@ -181,18 +184,18 @@ See Gradle's [incremental build](https://docs.gradle.org/current/userguide/incre
 [build cache](https://docs.gradle.org/current/userguide/build_cache.html) documentation.
 
 ### Task Coordination Protocol
-Tasks live in `PLAN.md` and `.plan/tasks/` and are managed only through the `plan` CLI; see `AGENTS.md` and the
+Tasks live in `PLAN.md` and `.plan/tasks/` and are managed only through the `plan` CLI; see [AGENTS.md](../AGENTS.md) and the
 [cross-project development guidelines](https://github.com/gpellicciotta/dev-guidelines).
 Mainline is `main`.
 
 ---
 
 ## Scaffolding a New Project
-Generated projects start at `0.1.0-pre` in `gradle.properties`, with a matching `## v0.1.0-pre` changelog heading.
+Generated projects start at `0.1.0-pre` in [gradle.properties](../gradle.properties), with a matching `## v0.1.0-pre` changelog heading.
 `create` skips the template's plan store: `PLAN.md`, `.plan/`, and `plan.code-workspace`.
 After the bootstrap has run `git init`, create the new project's store with `plan init --store branch`.
-It keeps plan data on an orphan `plan` branch, as the copied `.gitignore` expects.
-`create` finds the template root by `build.gradle`, `settings.gradle`, `CHANGELOG.md`, and `src/main/java/myproject/`.
+It keeps plan data on an orphan `plan` branch, as the copied [.gitignore](../.gitignore) expects.
+`create` finds the template root by [build.gradle](../build.gradle), [settings.gradle](../settings.gradle), [CHANGELOG.md](../CHANGELOG.md), and [myproject/](../src/main/java/myproject/).
 It needs no plan data, so it works in CI checkouts of `main`.
 
 To create a new project from this template:
