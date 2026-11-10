@@ -5,6 +5,7 @@ from __future__ import annotations
 import contextlib
 import importlib.util
 import io
+import json
 import subprocess
 import sys
 import tempfile
@@ -29,6 +30,28 @@ def write_versions(root: Path, gradle_version: str, changelog_version: str) -> N
     (root / "CHANGELOG.md").write_text(f"# Changelog\n\n## v{changelog_version}\n- Entry.\n", encoding="utf-8")
 
 
+def recording_project(test: unittest.TestCase, failing: str = ""):
+    """Return the recorded commands and a devops project whose runner records commands instead of running them."""
+    calls: list[list[str]] = []
+
+    def runner(argv, cwd, logger):
+        calls.append(list(argv))
+        return 1 if failing and Path(argv[0]).stem == failing else 0
+
+    tmp = tempfile.TemporaryDirectory()
+    test.addCleanup(tmp.cleanup)
+    root = Path(tmp.name)
+    (root / ("gradlew.bat" if sys.platform == "win32" else "gradlew")).write_text("", encoding="utf-8")
+    project = load_devops().build_cli(root).project
+    project.runner = runner
+    return calls, project
+
+
+def command_names(argv: list[str]) -> list[str]:
+    """Return argv with its executable reduced to the bare command name."""
+    return [Path(argv[0]).stem, *argv[1:]]
+
+
 class DevopsScriptTest(unittest.TestCase):
     def test_builds_devops_cli_over_gradle_project_at_repo_root(self) -> None:
         cli = load_devops().build_cli()
@@ -40,6 +63,28 @@ class DevopsScriptTest(unittest.TestCase):
         project = load_devops().build_cli().project
         self.assertEqual("doFullRelease", project.release_task)
         self.assertEqual(["-PreleaseConfirmed=yes"], project.release_args)
+
+    def test_lint_runs_lint_markdown_before_gradle_lint_tasks(self) -> None:
+        calls, project = recording_project(self)
+        self.assertTrue(project.lint())
+        self.assertEqual(["lint-markdown", "check"], command_names(calls[0]))
+        self.assertEqual(["spotlessCheck", "checkstyleMain", "checkstyleTest"], calls[1][-3:])
+
+    def test_check_runs_lint_markdown_before_gradle_build(self) -> None:
+        calls, project = recording_project(self)
+        self.assertTrue(project.check())
+        self.assertEqual(["lint-markdown", "check"], command_names(calls[0]))
+        self.assertEqual(["build"], calls[1][-1:])
+
+    def test_check_skips_gradle_build_when_lint_markdown_fails(self) -> None:
+        calls, project = recording_project(self, failing="lint-markdown")
+        self.assertFalse(project.check())
+        self.assertEqual(1, len(calls))
+
+    def test_lint_markdown_excludes_changelog_and_keeps_default_excludes(self) -> None:
+        config = json.loads((REPO_ROOT / ".lint-markdown.json").read_text(encoding="utf-8"))
+        for pattern in ("CHANGELOG.md", ".git", ".venv", "build", "work"):
+            self.assertIn(pattern, config["exclude"])
 
     def test_help_lists_standard_actions(self) -> None:
         result = subprocess.run(

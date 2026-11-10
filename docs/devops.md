@@ -57,19 +57,21 @@ subcommand. Projects derived from this template that deploy a service should add
 CLI conventions.
 
 ### Operations Runner `devops.py`
-`scripts/devops.py` is the single entry point to typical operations; run `python scripts/devops.py help --verbose`.
+[devops.py](../scripts/devops.py) is the single entry point to typical operations; run `python scripts/devops.py help --verbose`.
 It is a thin `DevopsCli` over a `GradleProject` from support-python's `support_python.devops`.
 When `.venv` exists, it reruns itself with the `.venv` interpreter, so plain `python` works.
 
 ```shell
-python scripts/devops.py check      # every CI validation step: gradlew build (Spotless, Checkstyle, tests, jars)
-python scripts/devops.py lint       # spotlessCheck, checkstyleMain, checkstyleTest
+python scripts/devops.py check      # every CI validation step: lint-markdown check, then gradlew build (Spotless, Checkstyle, tests, jars)
+python scripts/devops.py lint       # lint-markdown check, then spotlessCheck, checkstyleMain, checkstyleTest
 python scripts/devops.py format     # spotlessApply
 python scripts/devops.py test myproject.CoreTest   # each selection becomes a Gradle --tests filter
 python scripts/devops.py versions   # fail when gradle.properties and CHANGELOG.md versions drift apart
 python scripts/devops.py release --dry-run
 ```
 
+`lint` and `check` run `lint-markdown check` first and stop when it fails.
+[.lint-markdown.json](../.lint-markdown.json) excludes `CHANGELOG.md`, whose finalized entries must stay unedited, and repeats the default excludes it replaces.
 Add project-specific actions in `build_cli()` with `cli.add_action(name, summary, handler)`.
 See support-python's [DevOps scripts tutorial](https://github.com/gpellicciotta/support.python/blob/v2.0.0/docs/tutorials/devops-scripts.md).
 Test the script itself with `.venv/Scripts/python -m unittest discover -s scripts/tests` (`.venv/bin/python` outside Windows).
@@ -171,7 +173,7 @@ It refuses to start without `-PreleaseConfirmed=yes`. It runs `build` (compile, 
 - `finalizeRelease` - strips `-pre` from `gradle.properties`, marks the CHANGELOG heading
   `[released: <date>]`, and commits.
 - `publishReleaseArtifacts` - runs `publishMavenPublicationToGithubPackagesRepository` in a nested Gradle run if this
-  project has opted into `maven-publish` per `docs/library-publishing.md`; otherwise a no-op (this template ships
+  project has opted into `maven-publish` per [library-publishing.md](library-publishing.md); otherwise a no-op (this template ships
   as an application, not a library).
 - `tagAndPushRelease` - tags the release commit `v<version>` and pushes the branch and tag to `origin`.
 - `createGithubRelease` - runs `gh release create` for the new tag, using the CHANGELOG section as notes
@@ -185,8 +187,8 @@ resume a failed release without repeating the steps already done.
 ---
 
 ## Continuous Integration
-The GitHub Actions workflow in `.github/workflows/ci.yml` triggers on push and pull requests, executing:
+The GitHub Actions workflow in [ci.yml](../.github/workflows/ci.yml) triggers on push and pull requests, executing:
 - Java JDK 25 and Python 3 setup.
 - `python -m pip install -r scripts/requirements.txt`, installing support-python into the runner's Python, without a `.venv`.
 - `python -m unittest discover -s scripts/tests`, testing [devops.py](../scripts/devops.py) itself.
-- `python scripts/devops.py check`, which runs `./gradlew build` (compilation, Spotless, Checkstyle, unit testing, packaging).
+- `python scripts/devops.py check`, which runs `lint-markdown check` and then `./gradlew build` (compilation, Spotless, Checkstyle, unit testing, packaging).

@@ -138,7 +138,7 @@ Configure each application's main class in its own build file.
 The application plugin supplies `run`, start scripts, and distributions containing runtime dependencies.
 Direct `java -jar` execution additionally needs manifest and dependency packaging configuration; retain the template's manifest logic when migrating.
 
-These are [precompiled script plugins](https://docs.gradle.org/current/userguide/implementing_gradle_plugins_precompiled.html): each filename determines its plugin ID without `.gradle`.
+These are [precompiled script plugins](https://docs.gradle.org/current/userguide/implementing_gradle_plugins_precompiled.html): each filename minus its Gradle script extension determines its plugin ID.
 
 ## Apply conventions in each module
 `clients/java/build.gradle`:

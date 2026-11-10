@@ -25,11 +25,11 @@ See [environment prerequisites](docs/devops.md#prerequisites-and-environment) fo
 - Run the CLI: `.\gradlew.bat run --args="<command> [args]"` or `java -jar build/libs/<name>-<version>.jar <command> [args]` after building.
 - Run the test suite only: `.\gradlew.bat test`, or `python scripts/devops.py test myproject.CoreTest` for a selection.
 - Test [devops.py](scripts/devops.py) itself: `.venv/Scripts/python -m unittest discover -s scripts/tests`.
-- Run every CI validation step (Spotless, Checkstyle, tests, jars): `python scripts/devops.py check`
+- Run every CI validation step (Markdown lint, Spotless, Checkstyle, tests, jars): `python scripts/devops.py check`
 - Release: `python scripts/devops.py release` runs the `doFullRelease` pipeline (pushes, creates a GitHub release). **Never run it unless the user explicitly asks.**
 - **[TODO]** Add any other project-specific commands here.
 
-Projects that deploy a service add a `production` subcommand to `scripts/devops.py`; this template deploys nothing.
+Projects that deploy a service add a `production` subcommand to [devops.py](scripts/devops.py); this template deploys nothing.
 See the [development workflows](docs/devops.md#development-workflows) for bootstrap and build details.
 
 ## Architecture
@@ -47,7 +47,7 @@ These apply to every project scaffolded from this template, not just this one:
 - Favour simplicity over ingenuity. Keep things as simple as possible for what's actually needed today — don't
   design for hypothetical future requirements. Stay a single Gradle project as long as that's true; only split
   into a multi-project build (with a `buildSrc` convention plugin sharing the toolchain/test setup across
-  subprojects) once there's a real second module — see `docs/multi-module.md` for the minimal shape to reach
+  subprojects) once there's a real second module — see [multi-module.md](docs/multi-module.md) for the minimal shape to reach
   for at that point.
 - Minimize third-party dependencies. The JDK and JUnit are enough to start; add a dependency only when it
   earns its ongoing maintenance cost.
@@ -62,12 +62,12 @@ These apply to every project scaffolded from this template, not just this one:
   Release automation finalizes the current section and opens the next patch development version; see [release procedures](docs/devops.md#release-process).
 - `PLAN.md` (top-level) is the task index; change it and task frontmatter only through the `plan` CLI (see `AGENTS.md`).
 - `CHANGELOG.md`, `PLAN.md`, `LICENSE.md`, and `README.md` live at the repo root.
-- Core documentation lives under `docs/` (`docs/index.md`, `docs/requirements.md`, `docs/devops.md`, `docs/multi-module.md`).
+- Core documentation lives under `docs/` (`docs/index.md`, `docs/requirements.md`, `docs/devops.md`, [multi-module.md](docs/multi-module.md)).
 - Keep `README.md`'s setup/usage/layout sections in sync with the code as it evolves — treat drift there as a
   bug, not a documentation nice-to-have.
 - Non-obvious package design decisions (why it's split this way, what a package deliberately does or doesn't
   own) belong in that package's `package-info.java`, not a README fragment — see
-  `src/main/java/myproject/package-info.java` for the pattern.
+  [package-info.java](src/main/java/myproject/package-info.java) for the pattern.
 - `Scaffold.java` (`create` subcommand) copies this tree into a new project: keep its marker files, name placeholder
   (`template.java`), and skipped plan store in sync with the repository layout; `CliTest` and `ScaffoldTest` cover it.
   Its markers must be files tracked on `main`: plan data lives on the `plan` branch and is absent in CI.

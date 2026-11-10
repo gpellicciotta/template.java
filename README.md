@@ -82,7 +82,7 @@ This initializes a git repo (if one doesn't already exist), installs `scripts/re
 .\gradlew.bat test
 ```
 
-`python scripts/devops.py check` runs every CI validation step (Spotless, Checkstyle, tests, jar assembly).
+`python scripts/devops.py check` runs every CI validation step (Markdown lint, Spotless, Checkstyle, tests, jar assembly).
 `python scripts/devops.py test myproject.CoreTest` narrows the run to one class or method pattern.
 
 ## CLI

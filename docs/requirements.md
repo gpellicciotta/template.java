@@ -55,6 +55,6 @@ Functional and technical requirements for the `template.java` project.
 - **Companion Archives**: Generate source and Javadoc jars during `build`, including subprojects using the documented common convention.
 - **Javadoc**: Generate HTML5 documentation with doclint disabled and quiet output; retain failure on Javadoc errors.
 - **Static Checks**: Spotless (whitespace) and Checkstyle (Stroustrup braces, braces on every control block, public API Javadoc, `package-info.java`) run as part of `build`.
-- **Dependency Versions**: Declare all dependency and plugin versions centrally in `gradle/libs.versions.toml`.
+- **Dependency Versions**: Declare all dependency and plugin versions centrally in [libs.versions.toml](../gradle/libs.versions.toml).
 - **Code Standards**: 2-space indentation, UTF-8 encoding, US English, and LF line endings except CRLF for `.bat` and `.cmd` scripts.
 - **Binary Assets**: Declare common image, document, Java archive, compiled class, and font formats as binary in Git attributes.
