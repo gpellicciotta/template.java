@@ -35,11 +35,11 @@ public final class Scaffold {
 
   private static final String INITIAL_VERSION = "0.1.0-pre";
 
-  private static final List<String> MARKER_FILES = List.of("build.gradle", "PLAN.md", "CHANGELOG.md");
-  // The template's own planning history (tasks, work files) is not inherited by new projects.
-  private static final List<Path> EXCLUDED_PATHS = List.of(Path.of(".plan", "tasks"), Path.of(".plan", "work"));
+  // Tracked files only: plan data lives on the separate plan branch, so CI checkouts have no PLAN.md.
+  private static final List<String> MARKER_FILES = List.of("build.gradle", "settings.gradle", "CHANGELOG.md");
+  // The template's plan store is not inherited; new projects start from a fresh PLAN.md and run `plan init`.
   private static final Set<String> EXCLUDED_NAMES = Set.of(
-      ".git", ".gradle", "build", "out", ".idea", ".vscode", ".venv", "work", "__pycache__"
+      ".git", ".gradle", "build", "out", ".idea", ".vscode", ".venv", "work", "__pycache__", ".plan", "plan.code-workspace"
   );
 
   /**
@@ -56,6 +56,11 @@ public final class Scaffold {
     catch (URISyntaxException | NullPointerException | SecurityException e) {
       start = Paths.get(System.getProperty("user.dir"));
     }
+    return findTemplateRoot(start);
+  }
+
+  /** Walk up from {@code start} to the first directory holding the marker files and the template package. */
+  static Path findTemplateRoot(Path start) throws ScaffoldException {
     for (Path candidate = start; candidate != null; candidate = candidate.getParent()) {
       Path candidateDir = candidate;
       boolean hasMarkers = MARKER_FILES.stream().allMatch(name -> Files.isRegularFile(candidateDir.resolve(name)));
@@ -64,7 +69,7 @@ public final class Scaffold {
       }
     }
     throw new ScaffoldException(
-        "Could not locate the template project root (expected build.gradle, PLAN.md, CHANGELOG.md and "
+        "Could not locate the template project root (expected build.gradle, settings.gradle, CHANGELOG.md and "
         + "src/main/java/" + PACKAGE_NAME + "/ in a parent directory). 'create' must be run from within a "
         + "checkout of " + PROJECT_SLUG + " (e.g. via 'gradlew run --args=\"create ...\"')."
     );
@@ -99,9 +104,6 @@ public final class Scaffold {
     try (Stream<Path> walk = Files.walk(source)) {
       walk.forEach(path -> {
         Path relative = source.relativize(path);
-        if (EXCLUDED_PATHS.stream().anyMatch(relative::startsWith)) {
-          return;
-        }
         for (Path part : relative) {
           if (EXCLUDED_NAMES.contains(part.toString()) || part.toString().endsWith(".egg-info")) {
             return; // Skip anything under an excluded directory.

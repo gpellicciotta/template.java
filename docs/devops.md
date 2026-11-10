@@ -130,7 +130,11 @@ Mainline is `main`.
 
 ## Scaffolding a New Project
 Generated projects start at `0.1.0-pre` in `gradle.properties`, with a matching `## v0.1.0-pre` changelog heading.
-Their fresh `PLAN.md` has empty Next Milestone and Backlog sections, and `.plan/tasks` starts empty.
+Their fresh `PLAN.md` has empty Next Milestone and Backlog sections.
+`create` skips the template's `.plan/` store and `plan.code-workspace`, so run `plan init` in the new project.
+Use `plan init --store branch` to keep plan data on an orphan `plan` branch, as this template does.
+`create` finds the template root by `build.gradle`, `settings.gradle`, `CHANGELOG.md`, and `src/main/java/myproject/`.
+It needs no plan data, so it works in CI checkouts of `main`.
 
 To create a new project from this template:
 ```powershell
@@ -184,5 +188,5 @@ resume a failed release without repeating the steps already done.
 The GitHub Actions workflow in `.github/workflows/ci.yml` triggers on push and pull requests, executing:
 - Java JDK 25 and Python 3 setup.
 - `python -m pip install -r scripts/requirements.txt`, installing support-python into the runner's Python, without a `.venv`.
-- `python -m unittest discover -s scripts/tests`, testing `scripts/devops.py` itself.
+- `python -m unittest discover -s scripts/tests`, testing [devops.py](../scripts/devops.py) itself.
 - `python scripts/devops.py check`, which runs `./gradlew build` (compilation, Spotless, Checkstyle, unit testing, packaging).

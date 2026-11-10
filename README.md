@@ -42,9 +42,9 @@ template.java/
   gradlew / gradlew.bat
   LICENSE.md                # project license
   CHANGELOG.md              # versioned changes in reverse chronological order
-  PLAN.md                   # task index, managed through the `plan` CLI
+  PLAN.md                   # task index link into .plan/, managed through the `plan` CLI
   AGENTS.md                 # AI assistant pointer to the plan guidelines
-  .plan/                    # plan configuration, protocols, and task files
+  .plan/                    # plan store: a worktree of the orphan `plan` branch (not on main)
   build.gradle              # JDK toolchain, JUnit 6, Checkstyle, Spotless, application plugin, jar manifest
   config/checkstyle/        # Checkstyle rules (Stroustrup braces, public API Javadoc, package-info)
   gradle.properties         # group, version, author, copyright, and build settings
@@ -140,6 +140,6 @@ To do it by hand instead: copy this folder, then rename every occurrence of the 
 - This README's title, and `CLAUDE.md`'s placeholder sections
 - `CHANGELOG.md` — replace the version history with your project's initial `## v0.1.0-pre` entry
 - `gradle.properties`'s `version` — reset to `0.1.0-pre`
-- `PLAN.md` and `.plan/tasks/` — reset to empty `## Next Milestone` and `## Backlog` sections and no task files
+- `PLAN.md` — reset to empty `## Next Milestone` and `## Backlog` sections, skip `.plan/`, and run `plan init` in the new project
 
 Then follow **Quick Start** above to verify the rename didn't break anything before writing real code.

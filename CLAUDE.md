@@ -69,7 +69,8 @@ These apply to every project scaffolded from this template, not just this one:
   own) belong in that package's `package-info.java`, not a README fragment — see
   `src/main/java/myproject/package-info.java` for the pattern.
 - `Scaffold.java` (`create` subcommand) copies this tree into a new project: keep its marker files, name placeholder
-  (`template.java`), and fresh `PLAN.md` content in sync with the repository layout; `CliTest` covers it.
+  (`template.java`), and fresh `PLAN.md` content in sync with the repository layout; `CliTest` and `ScaffoldTest` cover it.
+  Its markers must be files tracked on `main`: plan data lives on the `plan` branch and is absent in CI.
 - Style guide: 2-space indentation (never tabs), UTF-8, LF line endings everywhere. Enforced by `.editorconfig`, Spotless, and Checkstyle (Stroustrup braces, public API Javadoc);
   don't let it drift from these numbers.
 - The version is stamped into the jar manifest (`build.gradle`'s `jar { manifest { ... } }`) and read back at
