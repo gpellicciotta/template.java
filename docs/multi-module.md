@@ -8,7 +8,7 @@ Both `counters` and `auth` define this structure in their `buildSrc/src/main/gro
 The library and application conventions each apply common; application does not inherit library.
 For specialized packaging, such as WAR files, apply common with the appropriate packaging plugin.
 
-Use this layout in a derived project, replacing `<group>` consistently with its plugin namespace, such as `com.example`:
+Use this layout in a derived project, replacing `{{group}}` consistently with its plugin namespace, such as `com.example`:
 
 ```text
 settings.gradle
@@ -18,9 +18,9 @@ gradle/
 buildSrc/
   build.gradle
   src/main/groovy/
-    <group>.java-common-conventions.gradle
-    <group>.java-library-conventions.gradle
-    <group>.java-application-conventions.gradle
+    {{group}}.java-common-conventions.gradle
+    {{group}}.java-library-conventions.gradle
+    {{group}}.java-application-conventions.gradle
 clients/java/
   build.gradle
   src/main/java/
@@ -70,7 +70,7 @@ repositories {
 ```
 
 ### Common Java defaults
-`buildSrc/src/main/groovy/<group>.java-common-conventions.gradle`:
+`buildSrc/src/main/groovy/{{group}}.java-common-conventions.gradle`:
 
 ```groovy
 plugins {
@@ -112,11 +112,11 @@ The shared defaults retain test output streaming, source archives, and HTML5 Jav
 Each Java subproject's `build` produces its main jar, `-sources.jar`, and `-javadoc.jar` under its own `build/libs/`.
 
 ### Reusable libraries
-`buildSrc/src/main/groovy/<group>.java-library-conventions.gradle`:
+`buildSrc/src/main/groovy/{{group}}.java-library-conventions.gradle`:
 
 ```groovy
 plugins {
-  id '<group>.java-common-conventions'
+  id '{{group}}.java-common-conventions'
   id 'java-library'
 }
 ```
@@ -125,11 +125,11 @@ Declare dependencies exposed through public signatures with `api`; use `implemen
 Publishing remains an optional concern covered in [Publishing a Reusable Library](library-publishing.md).
 
 ### Runnable applications
-`buildSrc/src/main/groovy/<group>.java-application-conventions.gradle`:
+`buildSrc/src/main/groovy/{{group}}.java-application-conventions.gradle`:
 
 ```groovy
 plugins {
-  id '<group>.java-common-conventions'
+  id '{{group}}.java-common-conventions'
   id 'application'
 }
 ```
@@ -145,7 +145,7 @@ These are [precompiled script plugins](https://docs.gradle.org/current/userguide
 
 ```groovy
 plugins {
-  id '<group>.java-library-conventions'
+  id '{{group}}.java-library-conventions'
 }
 ```
 
@@ -153,7 +153,7 @@ plugins {
 
 ```groovy
 plugins {
-  id '<group>.java-application-conventions'
+  id '{{group}}.java-application-conventions'
 }
 
 dependencies {
