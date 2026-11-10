@@ -79,12 +79,11 @@ class DevopsScriptTest(unittest.TestCase):
     def test_check_skips_gradle_build_when_lint_markdown_fails(self) -> None:
         calls, project = recording_project(self, failing="lint-markdown")
         self.assertFalse(project.check())
-        self.assertEqual(1, len(calls))
+        self.assertEqual([["lint-markdown", "check"]], [command_names(call) for call in calls])
 
-    def test_lint_markdown_excludes_changelog_and_keeps_default_excludes(self) -> None:
+    def test_lint_markdown_config_only_adds_changelog_to_default_excludes(self) -> None:
         config = json.loads((REPO_ROOT / ".lint-markdown.json").read_text(encoding="utf-8"))
-        for pattern in ("CHANGELOG.md", ".git", ".venv", "build", "work"):
-            self.assertIn(pattern, config["exclude"])
+        self.assertEqual(["CHANGELOG.md"], config["exclude"])
 
     def test_help_lists_standard_actions(self) -> None:
         result = subprocess.run(

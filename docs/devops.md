@@ -71,7 +71,7 @@ python scripts/devops.py release --dry-run
 ```
 
 `lint` and `check` run `lint-markdown check` first and stop when it fails.
-[.lint-markdown.json](../.lint-markdown.json) excludes `CHANGELOG.md`, whose finalized entries must stay unedited, and repeats the default excludes it replaces.
+[.lint-markdown.json](../.lint-markdown.json) adds `CHANGELOG.md`, whose finalized entries must stay unedited, to lint-markdown's default excludes.
 Add project-specific actions in `build_cli()` with `cli.add_action(name, summary, handler)`.
 See support-python's [DevOps scripts tutorial](https://github.com/gpellicciotta/support.python/blob/v2.0.0/docs/tutorials/devops-scripts.md).
 Test the script itself with `.venv/Scripts/python -m unittest discover -s scripts/tests` (`.venv/bin/python` outside Windows).
