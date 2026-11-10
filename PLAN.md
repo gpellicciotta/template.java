@@ -4,7 +4,7 @@ An overview of all tasks and their planning.
 ---
 
 ## Next Milestone
-- [ ] T0031 Make create work in checkouts without tracked plan data, so the scaffold test passes in CI again.
+- [x] T0031 Make create work in checkouts without tracked plan data, so the scaffold test passes in CI again.
 
 ---
 
