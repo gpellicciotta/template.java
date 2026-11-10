@@ -133,6 +133,7 @@ section "Release Process".
 
 ## Starting a new project from this template
 Preferred: run `gradlew run --args="create <project-name> [-o <output-dir>]"` (see **CLI** above) — it copies the tree and performs all required renaming automatically.
+Then bootstrap the new project and run `plan init --store branch` there to create its plan store.
 
 To do it by hand instead: copy this folder, then rename every occurrence of the placeholder names below:
 - `src/main/java/myproject/` and `src/test/java/myproject/` → `src/main/java/<your_package_name>/` and `src/test/java/<your_package_name>/` (and every `package myproject;`/`import myproject...` line inside them)

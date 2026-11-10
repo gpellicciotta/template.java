@@ -27,9 +27,10 @@ Functional and technical requirements for the `template.java` project.
 - Ensure core business logic remains independent of console streams, exit calls, or CLI frameworks for seamless unit testing.
 
 ### Project Scaffolding
-- Automate repository renaming, package restructuring, and fresh metadata in `CHANGELOG.md`, `PLAN.md`, and `gradle.properties`.
+- Automate repository renaming, package restructuring, and fresh metadata in `CHANGELOG.md` and `gradle.properties`.
 - Initialize `gradle.properties` at `0.1.0-pre`, with a matching `## v0.1.0-pre` changelog heading.
-- Reset `PLAN.md` to empty peer-level Next Milestone and Backlog sections, and leave out the template's `.plan/tasks` and `.plan/work` contents.
+- Leave out the template's plan store (`PLAN.md`, `.plan/`, `plan.code-workspace`); new projects run `plan init --store branch`.
+- Find the template root from files tracked on `main`, so `create` works in checkouts without plan data.
 - Prevent accidental overwrite when target directories already exist.
 
 ### Logging

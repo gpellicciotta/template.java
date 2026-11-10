@@ -61,6 +61,8 @@ class CliTest {
     assertTrue(out.contains("details:"));
     assertTrue(out.contains("create:"));
     assertTrue(out.contains("gradle.properties"));
+    assertTrue(out.contains("plan init --store branch"));
+    assertFalse(out.contains("PLAN.md"));
   }
 
   @Test
