@@ -13,7 +13,7 @@ A summarized overview of all changes, per version of this project.
 ---
 
 ## v3.0.0-pre
-- CLI: Fixed `create` failing in checkouts without plan data, such as CI; it finds the root by `settings.gradle` instead of `PLAN.md`.
+- CLI: Fixed `create` failing in checkouts without plan data, such as CI; it finds the root by `build.gradle`, `settings.gradle`, and `CHANGELOG.md` instead of `PLAN.md`.
 - CLI: **Breaking:** `create` no longer writes `PLAN.md` and skips the template's plan store; run `plan init --store branch` in the new project.
 - DevEx: Replaced the hand-written [devops.py](scripts/devops.py) with a thin `DevopsCli` over support-python v2.0.0's `GradleProject`, adding `lint` and `format`.
 - DevEx: **Breaking:** `devops.py test` now takes Gradle test patterns as arguments (`test myproject.CoreTest`) instead of `--tests`.
