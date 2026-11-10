@@ -1,15 +1,16 @@
 ---
 id: T0041
-owner: ~
-needs: [T0034]
+owner: "@claude-code"
+needs: []
 branch: —
 worktree: —
-status: ready
-started_at: —
-ended_at: —
+status: completed
+started_at: "2026-11-10T18:56:11Z"
+ended_at: "2026-11-10T18:58:18Z"
 review: none
 preview: none
 protocol: adhoc
+completion-commit: 93eb8260335690f70d9add71bc06936a1930d5ca
 ---
 # T0041: Move multi-module.md and library-publishing.md into docs/tutorials/ and update every link to them
 
@@ -32,10 +33,23 @@ Size estimate: 7 files, 30 lines
 - CHANGELOG.md
 
 ## Task Execution Steps
-- [ ] **[Doc]**       Move both guides into docs/tutorials/ with git mv.
-- [ ] **[Doc]**       Update every link and reference, and add a Docs entry to CHANGELOG.md.
-- [ ] **[Verify]**    Run lint-markdown check, devops.py check, and git grep for stale paths.
+- [x] **[Doc]**       Move both guides into docs/tutorials/ with git mv.
+- [x] **[Doc]**       Update every link and reference, and add a Docs entry to CHANGELOG.md.
+- [x] **[Verify]**    Run lint-markdown check, devops.py check, and git grep for stale paths.
 
 ## Execution Log
 - [2026-11-10] **[Doc]**
   Companion task file scaffolded at task creation.
+
+- [2026-11-10] **[Doc]**
+  Moved both guides into docs/tutorials/, fixed their links, and renamed the index section to Tutorials.
+
+- [2026-11-10] **[Verify]**
+  Recorded task outcomes.
+  - Files touched: 7.
+  - Lines touched: 28.
+  - Reopenings: 0.
+
+- [2026-11-10] **[Complete]**
+  Task completed successfully.
+
