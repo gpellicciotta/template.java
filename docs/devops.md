@@ -4,7 +4,9 @@ Practical guidance on building, testing, developing, and releasing for `template
 
 ---
 
-## Prerequisites and Environment
+## Development Environment
+
+### Prerequisites
 - **JDK**: Java 25 (auto-provisioned by Gradle toolchain if not present locally).
 - **Gradle**: Gradle 9.x (managed via the included Gradle wrapper `./gradlew` / `gradlew.bat`).
 - **Git**: Git 2.30+ supporting worktrees (`git worktree`).
@@ -13,15 +15,11 @@ Practical guidance on building, testing, developing, and releasing for `template
   `devops.py` runs on [support-python](https://github.com/gpellicciotta/support.python), pinned in `scripts/requirements.txt`.
 - **GitHub Packages access**: `build.gradle` depends on `com.pellicciotta:support.java`, hosted on the
   `gpellicciotta/support.java` GitHub Packages repo. Local builds need a GitHub PAT with `read:packages`
-  set as `github.token` (and `github.username`) in `{user.home}/.gradle/gradle.properties`, or the
+  set as `github.token` (and `github.username`) in `{{user-home}}/.gradle/gradle.properties`, or the
   `GITHUB_USERNAME`/`GITHUB_TOKEN` env vars. CI reads the PAT from the `PACKAGES_TOKEN` repo secret.
 - **Dependency versions**: All dependency and plugin versions live in [libs.versions.toml](../gradle/libs.versions.toml).
 
----
-
-## Development Workflows
-
-### Initial Bootstrap
+### Setup
 Clone the repository and run the bootstrap script:
 ```shell
 python scripts/bootstrap-dev-environment.py
@@ -31,10 +29,69 @@ It then runs `gradlew build`.
 A project-local `.venv` keeps the pinned support-python apart from other projects pinning other versions.
 Rerun the bootstrap after changing `scripts/requirements.txt`.
 
-### VS Code Workspace Settings
 The shared [.vscode/settings.json](../.vscode/settings.json) enables automatic Java build configuration updates.
 Keep shared settings portable; configure machine-specific JDK paths and personal preferences in VS Code user settings.
 Other files and directories under `.vscode/` remain ignored by default, including in nested modules.
+
+---
+
+## Versioning and Releasing
+
+### Updating Versions
+[gradle.properties](../gradle.properties) holds the authoritative `version`, without a `v` prefix.
+The top [CHANGELOG.md](../CHANGELOG.md) heading must match it exactly, `-pre` suffix included, with a `v` prefix.
+[build.gradle](../build.gradle) stamps the version into the jar manifest with `+{{commit}}` build metadata.
+`Cli.version()` reads it back at runtime.
+
+Bump the version as part of the change that requires it:
+- Breaking change: raise the major version and reset minor and patch, unless the `-pre` version already did.
+- New functionality: raise the minor version and reset the patch, unless the `-pre` version already did.
+- Rename `version` and the top `CHANGELOG.md` heading together, in the same commit as the change.
+
+`plan` task completion raises the patch of Python projects in `pyproject.toml`, but it does not read `gradle.properties` yet.
+In this project, the release pipeline's `openNextPreRelease` step raises the patch instead.
+Run `python scripts/devops.py versions` to fail fast when the two versions drift apart.
+
+### Making a Release
+A release pushes to `origin` and creates a GitHub release, so it only runs on explicit request.
+1. Confirm every change of the version is recorded under the top `-pre` heading of `CHANGELOG.md`.
+2. Run `python scripts/devops.py versions` and `python scripts/devops.py check`, and fix any failure.
+3. Commit and push `main`, then wait until CI on `origin/main` is green.
+4. Authenticate the [GitHub CLI](https://cli.github.com/) with `gh auth login`, if not done yet.
+5. Preview the pipeline with `python scripts/devops.py release --dry-run`.
+6. Run `python scripts/devops.py release` and type the requested confirmation; `--yes` skips it.
+7. Check the new `v{{version}}` tag, the GitHub release, and the next `-pre` heading on `origin/main`.
+
+```shell
+python scripts/devops.py release --dry-run   # list the pipeline tasks only
+python scripts/devops.py release             # asks for a typed confirmation, then runs doFullRelease -PreleaseConfirmed=yes
+python scripts/devops.py release --yes       # skips the typed confirmation
+```
+
+#### Gradle `doFullRelease` Pipeline
+`devops.py release` runs this pipeline, which can also run directly:
+```powershell
+.\gradlew.bat doFullRelease -PreleaseConfirmed=yes
+```
+It refuses to start without `-PreleaseConfirmed=yes`. It runs `build` (compile, Spotless, Checkstyle, tests), then in order:
+- `checkReleasePreconditions` - fails unless confirmed, the tree is clean, the branch is `main`, `CHANGELOG.md`
+  has a matching un-released heading, `gh` is authenticated, and HEAD equals `origin/main` with green CI.
+- `finalizeRelease` - strips `-pre` from `gradle.properties`, marks the CHANGELOG heading
+  `[released: {{date}}]`, and commits.
+- `publishReleaseArtifacts` - runs `publishMavenPublicationToGithubPackagesRepository` in a nested Gradle run if this
+  project has opted into `maven-publish` per [library-publishing.md](library-publishing.md); otherwise a no-op (this template ships
+  as an application, not a library).
+- `tagAndPushRelease` - tags the release commit `v{{version}}` and pushes the branch and tag to `origin`.
+- `createGithubRelease` - runs `gh release create` for the new tag, using the CHANGELOG section as notes.
+- `openNextPreRelease` - bumps `gradle.properties` to the next patch `-pre` version, opens a matching
+  `CHANGELOG.md` heading, and commits and pushes.
+
+Any individual step can also be run on its own (e.g. `.\gradlew.bat checkReleasePreconditions`) to diagnose or
+resume a failed release without repeating the steps already done.
+
+---
+
+## Development Workflows
 
 ### Local Environment Files and Compiler Output
 [.gitignore](../.gitignore) excludes `.env`, `**/*.env`, and `bin/` at the root and within nested modules.
@@ -141,48 +198,11 @@ It needs no plan data, so it works in CI checkouts of `main`.
 To create a new project from this template:
 ```powershell
 # Using the CLI
-java -jar build/libs/template.java-<version>.jar create my-new-tool -o C:\Dev-Projects
+java -jar build/libs/template.java-{{version}}.jar create my-new-tool -o {{output-dir}}
 
 # Or via Gradle run
-.\gradlew.bat run --args="create my-new-tool -o C:\Dev-Projects"
+.\gradlew.bat run --args="create my-new-tool -o {{output-dir}}"
 ```
-
----
-
-## Release Process
-Ongoing work accumulates under the top `CHANGELOG.md` heading while it carries a `-pre` SemVer suffix (e.g.
-`## v1.1.1-pre`), which must always match `version` in `gradle.properties` (the single source of truth) exactly,
-`-pre` included.
-
-### Releasing with `devops.py`
-```shell
-python scripts/devops.py release --dry-run   # list the pipeline tasks only
-python scripts/devops.py release             # asks for a typed confirmation, then runs doFullRelease -PreleaseConfirmed=yes
-python scripts/devops.py release --yes       # skips the typed confirmation
-```
-
-The release pushes to `origin` and creates a GitHub release, so it only runs on explicit request.
-
-### Gradle `doFullRelease` Pipeline
-```powershell
-.\gradlew.bat doFullRelease -PreleaseConfirmed=yes
-```
-It refuses to start without `-PreleaseConfirmed=yes`. It runs `build` (compile, Spotless, Checkstyle, tests), then in order:
-- `checkReleasePreconditions` - fails unless confirmed, the tree is clean, the branch is `main`, `CHANGELOG.md`
-  has a matching un-released heading, `gh` is authenticated, and HEAD equals `origin/main` with green CI.
-- `finalizeRelease` - strips `-pre` from `gradle.properties`, marks the CHANGELOG heading
-  `[released: <date>]`, and commits.
-- `publishReleaseArtifacts` - runs `publishMavenPublicationToGithubPackagesRepository` in a nested Gradle run if this
-  project has opted into `maven-publish` per [library-publishing.md](library-publishing.md); otherwise a no-op (this template ships
-  as an application, not a library).
-- `tagAndPushRelease` - tags the release commit `v<version>` and pushes the branch and tag to `origin`.
-- `createGithubRelease` - runs `gh release create` for the new tag, using the CHANGELOG section as notes
-  (requires the [GitHub CLI](https://cli.github.com/) installed and authenticated via `gh auth login`).
-- `openNextPreRelease` - bumps `gradle.properties` to the next patch `-pre` version, opens a matching
-  `CHANGELOG.md` heading, and commits and pushes.
-
-Any individual step can also be run on its own (e.g. `.\gradlew.bat checkReleasePreconditions`) to diagnose or
-resume a failed release without repeating the steps already done.
 
 ---
 

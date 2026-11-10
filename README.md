@@ -13,15 +13,18 @@ template.java/
       Cli.java              # entry point (registered in build.gradle's application {mainClass})
       Log.java              # minimal reference logging implementation (console + --log-file)
       Scaffold.java         # `create` subcommand: copies + renames this template into a new project
+      package-info.java     # package design notes
     test/java/myproject/
       CoreTest.java
       CliTest.java
       LogTest.java
+      ScaffoldTest.java
   docs/                     # project documentation
     index.md                # documentation index
     requirements.md         # functional and technical requirements
-    devops.md               # environment, operations, workflows, and release processes
+    devops.md               # environment, versioning and releasing, workflows, and CI
     multi-module.md         # design note for multi-module Gradle builds
+    library-publishing.md   # optional maven-publish setup for GitHub Packages
   build/                    # generated Gradle output; ignored by Git
     classes/                # compiled main and test classes
     generated/              # generated source and header files
@@ -33,7 +36,7 @@ template.java/
     tmp/                    # temporary build state
   .github/
     workflows/
-      ci.yml                # gradlew build (compile + test + jar), on push/PR
+      ci.yml                # devops.py tests, then devops.py check, on push/PR
   gradle/
     libs.versions.toml      # central dependency and plugin versions
     release.gradle          # doFullRelease pipeline
@@ -50,7 +53,11 @@ template.java/
   gradle.properties         # group, version, author, copyright, and build settings
   settings.gradle           # rootProject.name
   .gitignore
+  .gitattributes            # LF normalization, CRLF for .bat/.cmd, binary file types
   .editorconfig             # indent/charset/line-ending settings
+  .lint-markdown.json       # lint-markdown excludes (CHANGELOG.md)
+  .vscode/
+    settings.json           # shared, portable VS Code Java settings
   scripts/
     bootstrap-dev-environment.py  # one-shot bootstrap: git init, .venv with support-python, gradlew build
     devops.py                     # thin DevopsCli runner: check, lint, test, build, versions, release
@@ -61,13 +68,13 @@ template.java/
 
 `build/` is created by Gradle and should not be committed. Delete it with `Remove-Item -Recurse -Force build` when a clean rebuild is needed; the next Gradle command recreates the required directories.
 
-Java uses the standard `src/main/java/{{package}}` + `src/test/java/{{package}}` layout (the Maven/Gradle default, and what every Java IDE expects out of the box).
+Java uses the standard `src/main/java/{{package-name}}` + `src/test/java/{{package-name}}` layout (the Maven/Gradle default, and what every Java IDE expects out of the box).
 
 ## Quick Start
 `build.gradle` depends on `com.pellicciotta:support.java`, hosted on the `support.java` GitHub
 Packages repo. Set a GitHub PAT with `read:packages` as `github.token`/`github.username` in
-`{user.home}/.gradle/gradle.properties`, or as the `GITHUB_USERNAME`/`GITHUB_TOKEN` env vars, before building
-(see `docs/devops.md`, section "Prerequisites and Environment").
+`{{user-home}}/.gradle/gradle.properties`, or as the `GITHUB_USERNAME`/`GITHUB_TOKEN` env vars, before building
+(see the [prerequisites](docs/devops.md#prerequisites)).
 
 Open a shell in the project root and run:
 
@@ -87,26 +94,26 @@ This initializes a git repo (if one doesn't already exist), installs `scripts/re
 
 ## CLI
 ```powershell
-java -jar build/libs/template.java-<version>.jar help
-java -jar build/libs/template.java-<version>.jar version
-java -jar build/libs/template.java-<version>.jar greet <name>
-java -jar build/libs/template.java-<version>.jar create <project-name> [-o <output-dir>]
+java -jar build/libs/template.java-{{version}}.jar help
+java -jar build/libs/template.java-{{version}}.jar version
+java -jar build/libs/template.java-{{version}}.jar greet {{name}}
+java -jar build/libs/template.java-{{version}}.jar create {{project-name}} [-o {{output-dir}}]
 ```
 
-`create` scaffolds a new project as a copy of this template at `<output-dir>/<project-name>` (current directory if `-o` is omitted), automating the renames described below in **Starting a new project from this template**. Run it from within a checkout of this template (i.e. after `python scripts/bootstrap-dev-environment.py` or `gradlew build` in this repo). `create` locates the template root by walking up from wherever its own compiled class was loaded from.
+`create` scaffolds a new project as a copy of this template at `{{output-dir}}/{{project-name}}` (current directory if `-o` is omitted), automating the renames described below in **Starting a new project from this template**. Run it from within a checkout of this template (i.e. after `python scripts/bootstrap-dev-environment.py` or `gradlew build` in this repo). `create` locates the template root by walking up from wherever its own compiled class was loaded from.
 
-For a development run without building or naming the jar, use `.\gradlew.bat run --args="<command> [args]"`.
+For a development run without building or naming the jar, use `.\gradlew.bat run --args="{{command}} {{args}}"`.
 
 ## Logging
 `greet` and `create` log a startup message (name, version, command, config) and a completion summary (duration,
 exit code) via `Log.java`, a minimal reference implementation of the cross-project logging guideline:
 
 ```powershell
-java -jar build/libs/template.java-<version>.jar --debug --log-file app.log greet Gio
+java -jar build/libs/template.java-{{version}}.jar --debug --log-file app.log greet Gio
 ```
 
 - `--debug` enables `DEBUG`-level messages (discarded by default).
-- `--log-file <path>` appends timestamped, formatted log lines to `<path>` in addition to the console.
+- `--log-file {{path}}` appends timestamped, formatted log lines to `{{path}}` in addition to the console.
 - Console output omits timestamps and the `INFO` severity indicator; `--log-file` entries always carry both.
 
 `help` and `version` stay single-line and scriptable and never emit log lines. Call `Log.error`/`Log.warn`/
@@ -128,15 +135,15 @@ python scripts/devops.py release --dry-run
 python scripts/devops.py release
 ```
 
-It needs a clean `main` pushed to `origin` with green CI, and an authenticated `gh` CLI. See `docs/devops.md`,
-section "Release Process".
+It needs a clean `main` pushed to `origin` with green CI, and an authenticated `gh` CLI. See
+[Making a Release](docs/devops.md#making-a-release).
 
 ## Starting a new project from this template
-Preferred: run `gradlew run --args="create <project-name> [-o <output-dir>]"` (see **CLI** above) — it copies the tree and performs all required renaming automatically.
+Preferred: run `gradlew run --args="create {{project-name}} [-o {{output-dir}}]"` (see **CLI** above) — it copies the tree and performs all required renaming automatically.
 Then bootstrap the new project and run `plan init --store branch` there to create its plan store.
 
 To do it by hand instead: copy this folder, then rename every occurrence of the placeholder names below:
-- `src/main/java/myproject/` and `src/test/java/myproject/` → `src/main/java/<your_package_name>/` and `src/test/java/<your_package_name>/` (and every `package myproject;`/`import myproject...` line inside them)
+- `src/main/java/myproject/` and `src/test/java/myproject/` → `src/main/java/{{package-name}}/` and `src/test/java/{{package-name}}/` (and every `package myproject;`/`import myproject...` line inside them)
 - `settings.gradle`'s `rootProject.name = 'template.java'`
 - This README's title, and the `[TODO]` sections of [AGENTS.md](AGENTS.md)
 - `CHANGELOG.md` — replace the version history with your project's initial `## v0.1.0-pre` entry

@@ -13,7 +13,7 @@ See [README.md](README.md), [requirements.md](docs/requirements.md), and [devops
 
 ## Commands
 Use `.\gradlew.bat` in Windows PowerShell and `./gradlew` in POSIX shells.
-Builds need GitHub Packages access; see the [environment prerequisites](docs/devops.md#prerequisites-and-environment).
+Builds need GitHub Packages access; see the [environment prerequisites](docs/devops.md#prerequisites).
 
 - Bootstrap: `python scripts/bootstrap-dev-environment.py` initializes Git, fills `.venv` from `scripts/requirements.txt`, and builds.
 - Fast tests: `.\gradlew.bat test`, or `python scripts/devops.py test myproject.CoreTest` for a selection.

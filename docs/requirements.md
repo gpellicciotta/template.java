@@ -17,9 +17,9 @@ Functional and technical requirements for the `template.java` project.
 ### CLI Entry Point
 - Provide a subcommand-driven CLI supporting standard commands:
   - `help` (and `--help`, `-h`): displays tool version, description, usage, and exit codes.
-  - `version` (and `--version`): displays `{name} v{version} - {copyright}` in a single line.
+  - `version` (and `--version`): displays `{{name}} v{{version}} - {{copyright}}` in a single line.
   - `greet [name]`: sample business logic action demonstrating CLI-to-core dispatch.
-  - `create <project-name> [-o <output-dir>]`: scaffolds a new project as a renamed copy of the template.
+  - `create {{project-name}} [-o {{output-dir}}]`: scaffolds a new project as a renamed copy of the template.
 - Exit with code 0 on successful command completion or help/version invocation; exit with non-zero on errors.
 
 ### Core Logic Separation
@@ -36,8 +36,8 @@ Functional and technical requirements for the `template.java` project.
 ### Logging
 - Provide a minimal reference logging implementation (`myproject.Log`) satisfying the cross-project logging
   guideline: formatted, timestamped log lines, level gating, and an optional append-only log file.
-- Support `--debug` (enables `DEBUG`-level messages, discarded by default) and `--log-file <path>` (appends
-  formatted log lines to `<path>` in addition to the console) as global CLI options.
+- Support `--debug` (enables `DEBUG`-level messages, discarded by default) and `--log-file {{path}}` (appends
+  formatted log lines to `{{path}}` in addition to the console) as global CLI options.
 - Log a multi-line startup message (name, version, command, config) and a completion summary (duration, exit
   code) around operational commands (`greet`, `create`); `help`/`version` stay single-line and unlogged.
 
