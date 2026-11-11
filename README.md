@@ -17,8 +17,10 @@ template.java/
     test/java/myproject/
       CoreTest.java
       CliTest.java
+      JarEndToEndTest.java  # @Tag("slow") end-to-end tests against the built jar
       LogTest.java
       ScaffoldTest.java
+      StateLeakGuard.java   # JUnit extension failing runs that write to user.home or the repo
   docs/                     # project documentation
     index.md                # documentation index
     requirements.md         # functional and technical requirements
@@ -89,13 +91,15 @@ This initializes a git repo (if one doesn't already exist), installs [requiremen
 ## Running Tests
 ```powershell
 .\gradlew.bat test
+.\gradlew.bat slowTest
 .\.venv\Scripts\python -m pytest scripts/tests
 .\.venv\Scripts\ruff check scripts
 .\.venv\Scripts\ruff format --check scripts
 ```
 
-`python scripts/devops.py check` runs every CI validation step (Markdown lint, Spotless, Checkstyle, tests, jar assembly).
-`python scripts/devops.py test myproject.CoreTest` narrows the run to one class or method pattern.
+`test` runs the fast suite in parallel; `slowTest` builds the jar and runs `@Tag("slow")` tests.
+`python scripts/devops.py check` runs Markdown lint, Spotless, Checkstyle, both test suites, and jar assembly.
+`python scripts/devops.py test myproject.CoreTest` filters the fast suite; add `--slow` for the slow suite.
 [pyproject.toml](scripts/pyproject.toml) configures `pytest` and Ruff for [scripts/](scripts/).
 
 ## CLI

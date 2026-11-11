@@ -58,10 +58,88 @@ checkstyle {
   maxWarnings = 0
 }
 
-test {
-  useJUnitPlatform()
-  testLogging.showStandardStreams = true
+def generateTestServices = tasks.register('generateTestServices') {
+  def outputDir = layout.buildDirectory.dir('generated/test-services')
+  outputs.dir(outputDir)
+  doLast {
+    def serviceFile = outputDir.get().file('META-INF/services/org.junit.jupiter.api.extension.Extension').asFile
+    serviceFile.parentFile.mkdirs()
+    serviceFile.setText('myproject.StateLeakGuard\n', 'UTF-8')
+  }
 }
+
+sourceSets.test.output.dir(generateTestServices)
+
+def repoRootPath = projectDir.absolutePath
+tasks.withType(Test).configureEach {
+  def isolatedHomeDir = layout.buildDirectory.dir("tmp/${name}-user-home")
+  def initialHomeFile = isolatedHomeDir.get().asFile
+  def initialHomePath = initialHomeFile.absolutePath
+  environment 'HOME', initialHomePath
+  environment 'USERPROFILE', initialHomePath
+  environment 'XDG_CONFIG_HOME', new File(initialHomeFile, '.config').absolutePath
+  environment 'XDG_CACHE_HOME', new File(initialHomeFile, '.cache').absolutePath
+  environment 'XDG_DATA_HOME', new File(initialHomeFile, '.local/share').absolutePath
+  environment 'XDG_STATE_HOME', new File(initialHomeFile, '.local/state').absolutePath
+  environment 'APPDATA', new File(initialHomeFile, 'AppData/Roaming').absolutePath
+  environment 'LOCALAPPDATA', new File(initialHomeFile, 'AppData/Local').absolutePath
+  if (initialHomePath.length() >= 2 && initialHomePath.charAt(1) == (char) ':') {
+    environment 'HOMEDRIVE', initialHomePath.substring(0, 2)
+    environment 'HOMEPATH', initialHomePath.substring(2)
+  }
+  doFirst {
+    def home = isolatedHomeDir.get().asFile
+    home.deleteDir()
+    home.mkdirs()
+  }
+  testLogging {
+    events 'passed', 'skipped', 'failed'
+    showStandardStreams = true
+    info.events = events
+  }
+  systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+  systemProperty 'junit.jupiter.execution.parallel.config.executor-service', 'FORK_JOIN_POOL'
+  jvmArgumentProviders.add({
+    def homePath = isolatedHomeDir.get().asFile.absolutePath
+    [
+      "-Duser.home=${homePath}".toString(),
+      "-Dmyproject.isolated.home=${homePath}".toString(),
+      "-Dmyproject.repo.root=${repoRootPath}".toString()
+    ]
+  } as CommandLineArgumentProvider)
+}
+
+tasks.named('test') {
+  timeout = java.time.Duration.ofMinutes(5)
+  useJUnitPlatform { excludeTags 'slow' }
+  systemProperty 'junit.jupiter.execution.timeout.default', '30 s'
+  systemProperty 'junit.jupiter.execution.timeout.lifecycle.method.default', '30 s'
+  systemProperty 'junit.jupiter.execution.parallel.enabled', 'true'
+  systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
+}
+
+def jarArchive = tasks.named('jar').flatMap { it.archiveFile }
+tasks.register('slowTest', Test) {
+  description = 'Runs the slow test suite.'
+  group = 'verification'
+  timeout = java.time.Duration.ofMinutes(10)
+  testClassesDirs = sourceSets.test.output.classesDirs
+  classpath = sourceSets.test.runtimeClasspath
+  dependsOn tasks.named('jar')
+  inputs.file(jarArchive)
+    .withPropertyName('applicationJar')
+    .withPathSensitivity(PathSensitivity.NONE)
+  useJUnitPlatform { includeTags 'slow' }
+  systemProperty 'junit.jupiter.execution.timeout.default', '120 s'
+  systemProperty 'junit.jupiter.execution.timeout.lifecycle.method.default', '120 s'
+  systemProperty 'junit.jupiter.execution.parallel.enabled', 'true'
+  systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
+  jvmArgumentProviders.add({
+    ["-Dtest.jar.path=${jarArchive.get().asFile.absolutePath}".toString()]
+  } as CommandLineArgumentProvider)
+}
+
+tasks.named('check') { dependsOn 'slowTest' }
 
 // Formatting: normalizes whitespace only (trailing whitespace, final newline, tabs-to-spaces), deliberately
 // not a full reformatter (googleJavaFormat/eclipse). `check` already depends on `spotlessCheck` via the

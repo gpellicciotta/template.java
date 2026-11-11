@@ -12,6 +12,13 @@ import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,7 +38,7 @@ class LogTest {
 
   @AfterEach
   void resetToRealStreams() {
-    Log.configure(false, null, System.out, System.err);
+    Log.reset();
   }
 
   @Test
@@ -141,5 +148,54 @@ class LogTest {
     String errOut = errBuf.toString(StandardCharsets.UTF_8);
     assertTrue(errOut.contains("info on err"));
     assertTrue(errOut.contains("**[DEBUG]** debug on err"));
+  }
+
+  @Test
+  void concurrentConfigurationsStayIsolatedAcrossThreads(@TempDir Path tmpDir) throws Exception {
+    int threads = 4;
+    CyclicBarrier barrier = new CyclicBarrier(threads);
+    ExecutorService pool = Executors.newFixedThreadPool(threads);
+    try {
+      List<Callable<Void>> tasks = new ArrayList<>();
+      for (int i = 0; i < threads; i++) {
+        int id = i;
+        tasks.add(() -> {
+          ByteArrayOutputStream threadOut = new ByteArrayOutputStream();
+          ByteArrayOutputStream threadErr = new ByteArrayOutputStream();
+          Path threadLog = tmpDir.resolve("thread-" + id + ".log");
+          boolean debugMode = (id % 2 == 0);
+          try {
+            Log.configure(debugMode, threadLog,
+                new PrintStream(threadOut, true, "UTF-8"),
+                new PrintStream(threadErr, true, "UTF-8"));
+            barrier.await();
+            Log.info("msg-" + id);
+            Log.debug("dbg-" + id);
+            barrier.await();
+
+            String console = threadOut.toString(StandardCharsets.UTF_8);
+            String file = Files.readString(threadLog, StandardCharsets.UTF_8);
+            assertTrue(console.contains("msg-" + id));
+            assertEquals(debugMode, console.contains("dbg-" + id));
+            for (int other = 0; other < threads; other++) {
+              if (other != id) {
+                assertFalse(console.contains("msg-" + other));
+                assertFalse(file.contains("msg-" + other));
+              }
+            }
+          }
+          finally {
+            Log.reset();
+          }
+          return null;
+        });
+      }
+      for (Future<Void> future : pool.invokeAll(tasks)) {
+        future.get();
+      }
+    }
+    finally {
+      pool.shutdownNow();
+    }
   }
 }

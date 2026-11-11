@@ -17,9 +17,9 @@ import java.util.Objects;
  * Minimal reference logging implementation, just enough to satisfy the cross-project logging guideline:
  * formatted log lines to stdout/stderr and an optional append-only log file, gated by a configurable
  * {@link Level} threshold (defaulting to {@link Level#INFO}) and supporting stderr-only routing for JSON output.
- * Deliberately a single global sink rather than a named-logger SPI (see support.java's
- * {@code com.pellicciotta.support.logging} package for that) - grow into one only once a template-derived project
- * actually needs multiple back-ends or per-component loggers.
+ * Sink settings live per thread so concurrent CLI invocations and parallel tests never share mutable sink state;
+ * grow into a named-logger SPI (see support.java's {@code com.pellicciotta.support.logging} package) only once a
+ * template-derived project actually needs multiple back-ends or per-component loggers.
  */
 public final class Log {
   private Log() { }
@@ -36,15 +36,23 @@ public final class Log {
     DEBUG
   }
 
+  private record Sink(
+      Level threshold,
+      Path logFile,
+      PrintStream out,
+      PrintStream err,
+      boolean stderrOnly,
+      Clock clock
+  ) {
+    static Sink defaults() {
+      return new Sink(Level.INFO, null, System.out, System.err, false, Clock.systemUTC());
+    }
+  }
+
   private static final DateTimeFormatter TIMESTAMP_FORMAT =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC);
 
-  private static volatile Level threshold = Level.INFO;
-  private static volatile Path logFile = null;
-  private static volatile PrintStream out = System.out;
-  private static volatile PrintStream err = System.err;
-  private static volatile boolean stderrOnly = false;
-  private static volatile Clock clock = Clock.systemUTC();
+  private static final ThreadLocal<Sink> SINK = ThreadLocal.withInitial(Sink::defaults);
 
   /**
    * (Re)configure the sink; called once per {@code Cli.run} so state never leaks across invocations.
@@ -97,12 +105,19 @@ public final class Log {
    */
   public static void configure(
       Level minLevel, Path file, PrintStream outStream, PrintStream errStream, boolean allToErr, Clock timeSource) {
-    threshold = (minLevel != null) ? minLevel : Level.INFO;
-    logFile = file;
-    out = outStream;
-    err = errStream;
-    stderrOnly = allToErr;
-    clock = Objects.requireNonNull(timeSource, "timeSource");
+    SINK.set(new Sink(
+        (minLevel != null) ? minLevel : Level.INFO,
+        file,
+        outStream,
+        errStream,
+        allToErr,
+        Objects.requireNonNull(timeSource, "timeSource")
+    ));
+  }
+
+  /** Resets the current thread's sink configuration to the defaults. */
+  public static void reset() {
+    SINK.remove();
   }
 
   /**
@@ -188,28 +203,31 @@ public final class Log {
     return sb.toString();
   }
 
-  private static synchronized void write(Level level, String origin, String message) {
-    if (level.compareTo(threshold) > 0) {
+  private static void write(Level level, String origin, String message) {
+    Sink sink = SINK.get();
+    if (level.compareTo(sink.threshold()) > 0) {
       return;
     }
     String originTag = (origin == null || origin.isEmpty()) ? "" : "<" + origin + "> ";
 
     // Console: no timestamp, and INFO carries no severity indicator at all.
     String consolePrefix = (level == Level.INFO) ? originTag : (indicator(level) + " " + originTag);
-    PrintStream stream = (stderrOnly || level == Level.ERROR || level == Level.WARN) ? err : out;
-    stream.println(withIndentedContinuations(consolePrefix, message));
+    PrintStream stream = (sink.stderrOnly() || level == Level.ERROR || level == Level.WARN) ? sink.err() : sink.out();
+    synchronized (sink) {
+      stream.println(withIndentedContinuations(consolePrefix, message));
 
-    Path file = logFile;
-    if (file != null) {
-      String timestamp = "[" + TIMESTAMP_FORMAT.format(clock.instant()) + "] ";
-      String filePrefix = timestamp + indicator(level) + " " + originTag;
-      String fileLine = withIndentedContinuations(filePrefix, message);
-      try {
-        Files.writeString(file, fileLine + System.lineSeparator(), StandardCharsets.UTF_8,
-            StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-      }
-      catch (IOException e) {
-        throw new UncheckedIOException("failed to append to log file " + file, e);
+      Path file = sink.logFile();
+      if (file != null) {
+        String timestamp = "[" + TIMESTAMP_FORMAT.format(sink.clock().instant()) + "] ";
+        String filePrefix = timestamp + indicator(level) + " " + originTag;
+        String fileLine = withIndentedContinuations(filePrefix, message);
+        try {
+          Files.writeString(file, fileLine + System.lineSeparator(), StandardCharsets.UTF_8,
+              StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        }
+        catch (IOException e) {
+          throw new UncheckedIOException("failed to append to log file " + file, e);
+        }
       }
     }
   }

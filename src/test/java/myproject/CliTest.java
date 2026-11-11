@@ -1,7 +1,10 @@
 package myproject;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.api.parallel.Resources;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -22,6 +25,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CliTest {
+  @AfterEach
+  void resetLog() {
+    Log.reset();
+  }
+
   private static String runAndCaptureOut(String... args) throws Exception {
     ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
     ByteArrayOutputStream errBuf = new ByteArrayOutputStream();
@@ -365,6 +373,7 @@ class CliTest {
   }
 
   @Test
+  @ResourceLock(Resources.LOCALE)
   void createDryRunAndRealExecutionAgreeUnderTurkishLocale(@TempDir Path tmpDir) throws Exception {
     Locale original = Locale.getDefault();
     Locale.setDefault(Locale.forLanguageTag("tr-TR"));

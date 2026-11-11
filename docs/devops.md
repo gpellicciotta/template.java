@@ -122,10 +122,11 @@ It is a thin `DevopsCli` over a `GradleProject` from support-python's `support_p
 When `.venv` exists, it reruns itself with the `.venv` interpreter, so plain `python` works.
 
 ```shell
-python scripts/devops.py check      # every CI validation step: lint-markdown check, then gradlew build (Spotless, Checkstyle, tests, jars)
+python scripts/devops.py check      # every CI validation step: lint-markdown check, then gradlew build (Spotless, Checkstyle, fast + slow tests, jars)
 python scripts/devops.py lint       # lint-markdown check, then spotlessCheck, checkstyleMain, checkstyleTest
 python scripts/devops.py format     # spotlessApply
-python scripts/devops.py test myproject.CoreTest   # each selection becomes a Gradle --tests filter
+python scripts/devops.py test myproject.CoreTest                # fast suite with Gradle --tests filter
+python scripts/devops.py test --slow myproject.JarEndToEndTest  # slow suite with Gradle --tests filter
 python scripts/devops.py versions   # fail when gradle.properties and CHANGELOG.md versions drift apart
 python scripts/devops.py release --dry-run
 ```
@@ -159,16 +160,25 @@ Update both when changing ownership; `copyright` does not interpolate `author`.
 The existing CLI copyright and JAR vendor continue to derive from `author`.
 
 ```powershell
-# Run tests only
+# Run the fast test suite (excludes @Tag("slow"), 30 s per-test timeout)
 .\gradlew.bat test
 
-# Full compile, test, and assembly of application, source, and Javadoc jars
+# Build the jar and run the @Tag("slow") suite (120 s per-test timeout)
+.\gradlew.bat slowTest
+
+# Full compile, checks, fast and slow tests, and assembly of application, source, and Javadoc jars
 .\gradlew.bat build
 
 # Run application during development
 .\gradlew.bat run --args="help"
 .\gradlew.bat run --args="greet Gio"
 ```
+
+[build.gradle](../build.gradle) splits JUnit tests into `test` (30-second timeout) and `slowTest` (120-second timeout), both running concurrently.
+Tag integration, build, and end-to-end tests with `@Tag("slow")`, such as [JarEndToEndTest.java](../src/test/java/myproject/JarEndToEndTest.java).
+`slowTest` depends on `jar` and passes the archive path through the `test.jar.path` system property.
+`check` depends on `slowTest`, so `gradlew build`, `devops.py check`, and CI run both suites.
+[StateLeakGuard.java](../src/test/java/myproject/StateLeakGuard.java) isolates `user.home` and home environment variables, failing runs that write into either location or the repository.
 
 The build writes the main jar, `-sources.jar`, and `-javadoc.jar` to `build/libs/`.
 Run `sourcesJar` or `javadocJar` to generate either companion archive individually.
@@ -220,4 +230,4 @@ The GitHub Actions workflow in [ci.yml](../.github/workflows/ci.yml) runs two jo
 - `test-scripts` tests [scripts/](../scripts/) on Python 3.9 (`ubuntu-24.04`) and 3.x (`ubuntu-latest`) after installing [requirements.txt](../scripts/requirements.txt).
 - It runs `ruff check scripts`, `ruff format --check scripts`, and `python -m pytest scripts/tests`.
 - `test-build` sets up JDK 25 and Python 3.x, installs [requirements.txt](../scripts/requirements.txt), and runs `python scripts/devops.py check`.
-- `devops.py check` runs `lint-markdown check` and `./gradlew build` (compilation, Spotless, Checkstyle, unit tests, and JARs).
+- `devops.py check` runs `lint-markdown check` and `./gradlew build` (compilation, Spotless, Checkstyle, fast and slow tests, and JARs).

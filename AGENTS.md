@@ -17,9 +17,10 @@ Builds need GitHub Packages access; see the [environment prerequisites](docs/dev
 
 - Bootstrap: `python scripts/bootstrap-dev-environment.py` initializes Git, fills `.venv` from [requirements.txt](scripts/requirements.txt), and builds.
 - Fast tests: `.\gradlew.bat test`, or `python scripts/devops.py test myproject.CoreTest` for a selection.
+- Slow tests: `.\gradlew.bat slowTest`, or `python scripts/devops.py test --slow` for `@Tag("slow")` end-to-end tests.
 - Script tests: `.venv/Scripts/python -m pytest scripts/tests` (slow suite: add `-m slow --timeout=120`).
 - Script lint: `.venv/Scripts/ruff check scripts` and `.venv/Scripts/ruff format --check scripts`.
-- All checks (Markdown lint, Spotless, Checkstyle, tests, jars): `python scripts/devops.py check`.
+- All checks (Markdown lint, Spotless, Checkstyle, fast and slow tests, jars): `python scripts/devops.py check`.
 - Start the CLI: `.\gradlew.bat run --args="{{command}} {{args}}"`, or `java -jar build/libs/template.java-{{version}}.jar {{command}}` after a build.
 - **[TODO]** Add project-specific commands here.
 
