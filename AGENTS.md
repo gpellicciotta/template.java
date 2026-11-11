@@ -17,7 +17,8 @@ Builds need GitHub Packages access; see the [environment prerequisites](docs/dev
 
 - Bootstrap: `python scripts/bootstrap-dev-environment.py` initializes Git, fills `.venv` from [requirements.txt](scripts/requirements.txt), and builds.
 - Fast tests: `.\gradlew.bat test`, or `python scripts/devops.py test myproject.CoreTest` for a selection.
-- Script tests: `.venv/Scripts/python -m unittest discover -s scripts/tests`.
+- Script tests: `.venv/Scripts/python -m pytest scripts/tests` (slow suite: add `-m slow --timeout=120`).
+- Script lint: `.venv/Scripts/ruff check scripts` and `.venv/Scripts/ruff format --check scripts`.
 - All checks (Markdown lint, Spotless, Checkstyle, tests, jars): `python scripts/devops.py check`.
 - Start the CLI: `.\gradlew.bat run --args="{{command}} {{args}}"`, or `java -jar build/libs/template.java-{{version}}.jar {{command}}` after a build.
 - **[TODO]** Add project-specific commands here.
@@ -28,7 +29,7 @@ Builds need GitHub Packages access; see the [environment prerequisites](docs/dev
   - `Core`: business logic, free of CLI and IO concerns.
   - `Log`: minimal reference logging sink for console and `--log-file`.
   - `Scaffold`: the template-only `create` command; derived projects may delete it.
-- [scripts/](scripts/): the bootstrap and the thin [devops.py](scripts/devops.py) runner on support-python.
+- [scripts/](scripts/): the bootstrap, the thin [devops.py](scripts/devops.py) runner on support-python, and pytest/Ruff settings in [pyproject.toml](scripts/pyproject.toml).
 - [gradle/](gradle/): the version catalog, the wrapper, and the [release.gradle](gradle/release.gradle) `doFullRelease` pipeline.
 - [config/checkstyle/](config/checkstyle/): Checkstyle rules for braces, Javadoc, and [package-info.java](src/main/java/myproject/package-info.java).
 - [docs/](docs/): requirements, devops procedures, and the [multi-module](docs/tutorials/multi-module.md) and [library publishing](docs/tutorials/library-publishing.md) guides.

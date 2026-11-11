@@ -37,7 +37,7 @@ template.java/
     tmp/                    # temporary build state
   .github/
     workflows/
-      ci.yml                # devops.py tests, then devops.py check, on push/PR
+      ci.yml                # script Ruff + pytest matrix (3.9, 3.x) and devops.py check on push/PR
   gradle/
     libs.versions.toml      # central dependency and plugin versions
     release.gradle          # doFullRelease pipeline
@@ -60,10 +60,11 @@ template.java/
   .vscode/
     settings.json           # shared, portable VS Code Java settings
   scripts/
-    bootstrap-dev-environment.py  # one-shot bootstrap: git init, .venv with support-python, gradlew build
+    bootstrap-dev-environment.py  # one-shot bootstrap: git init, .venv from requirements.txt, gradlew build
     devops.py                     # thin DevopsCli runner: check, lint, test, build, versions, release
-    requirements.txt              # pins support-python for devops.py
-    tests/                        # unittest tests of devops.py
+    pyproject.toml                # Ruff and pytest configuration for scripts/
+    requirements.txt              # pins support-python, pytest, and Ruff for scripts/
+    tests/                        # pytest tests of devops.py
   CLAUDE.md                 # imports AGENTS.md for Claude Code
 ```
 
@@ -88,10 +89,14 @@ This initializes a git repo (if one doesn't already exist), installs [requiremen
 ## Running Tests
 ```powershell
 .\gradlew.bat test
+.\.venv\Scripts\python -m pytest scripts/tests
+.\.venv\Scripts\ruff check scripts
+.\.venv\Scripts\ruff format --check scripts
 ```
 
 `python scripts/devops.py check` runs every CI validation step (Markdown lint, Spotless, Checkstyle, tests, jar assembly).
 `python scripts/devops.py test myproject.CoreTest` narrows the run to one class or method pattern.
+[pyproject.toml](scripts/pyproject.toml) configures `pytest` and Ruff for [scripts/](scripts/).
 
 ## CLI
 ```powershell

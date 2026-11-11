@@ -13,6 +13,7 @@ A summarized overview of all changes, per version of this project.
 ---
 
 ## v3.0.0-pre
+- DevEx: Moved [test_devops.py](scripts/tests/test_devops.py) to `pytest`, added Ruff checks in [pyproject.toml](scripts/pyproject.toml), tested Python 3.9 in [ci.yml](.github/workflows/ci.yml), and pinned support-python v3.1.0.
 - CLI: Formatted `--log-file` timestamps in UTC in [Log.java](src/main/java/myproject/Log.java) and accepted an injectable `Clock` in `Log.configure`.
 - Docs: Moved the [multi-module](docs/tutorials/multi-module.md) and [library publishing](docs/tutorials/library-publishing.md) guides into `docs/tutorials/`.
 - Docs: Replaced bold bullet labels with plain bullets and linked repository file names in the README, agent instructions, and docs.
@@ -20,7 +21,7 @@ A summarized overview of all changes, per version of this project.
 - CLI: Gave the initial changelog entry that `create` writes a `DevEx:` area prefix and past-tense wording.
 - CLI: Fixed `create` failing without plan data, as in CI, by finding the root via [build.gradle](build.gradle), [settings.gradle](settings.gradle), and [CHANGELOG.md](CHANGELOG.md).
 - CLI: **[breaking]** Stopped `create` writing `PLAN.md` and copying the plan store; run `plan init --store branch` instead.
-- DevEx: Replaced the hand-written [devops.py](scripts/devops.py) with a thin `DevopsCli` over support-python v2.0.0, adding `lint` and `format`.
+- DevEx: Replaced the hand-written [devops.py](scripts/devops.py) with a thin `DevopsCli` over support-python v3.1.0, adding `lint` and `format`.
 - DevEx: **[breaking]** Changed `devops.py test` to take Gradle test patterns, such as `test myproject.CoreTest`, instead of `--tests`.
 - DevEx: Made the [bootstrap](scripts/bootstrap-dev-environment.py) fill a project-local `.venv`, where `devops.py` reruns itself; `create` skips `.venv`.
 - DevEx: Made [CI](.github/workflows/ci.yml) install [requirements.txt](scripts/requirements.txt) and run the [scripts/tests](scripts/tests/) suite before `devops.py check`.

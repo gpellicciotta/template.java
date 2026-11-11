@@ -23,16 +23,18 @@ try:
     from support_python.devops import DevopsCli, GradleProject
     from support_python.devops.steps import resolve_executable
 except ImportError as exc:
-    sys.exit(f"**[ERROR]** support-python v2 is missing ({exc}); run `python scripts/bootstrap-dev-environment.py` first.")
+    sys.exit(f"**[ERROR]** support-python v3 is missing ({exc}); run `python scripts/bootstrap-dev-environment.py` first.")
 
 
 class TemplateProject(GradleProject):
     """Gradle project whose `lint` and `check` also run `lint-markdown check`, stopping at the first failure."""
 
     def lint(self) -> bool:
+        """Run Markdown lint and then the Gradle lint tasks."""
         return self.lint_markdown() and super().lint()
 
     def check(self) -> bool:
+        """Run Markdown lint and then the full Gradle check."""
         return self.lint_markdown() and super().check()
 
     def lint_markdown(self) -> bool:

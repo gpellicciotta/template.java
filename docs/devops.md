@@ -13,7 +13,7 @@ Practical guidance on building, testing, developing, and releasing for `template
 - PowerShell on Windows, or a standard POSIX shell on macOS/Linux.
 
 - Python 3.9+ for [bootstrap-dev-environment.py](../scripts/bootstrap-dev-environment.py) (standard library only) and [devops.py](../scripts/devops.py).
-  The latter runs on [support-python](https://github.com/gpellicciotta/support.python), pinned in [requirements.txt](../scripts/requirements.txt).
+  [requirements.txt](../scripts/requirements.txt) pins [support-python](https://github.com/gpellicciotta/support.python) v3.1.0, `pytest`, `pytest-xdist`, `pytest-timeout`, and Ruff.
 
 - GitHub Packages access: [build.gradle](../build.gradle) depends on `com.pellicciotta:support.java`, hosted on the
   `gpellicciotta/support.java` GitHub Packages repo. Local builds need a GitHub PAT with `read:packages`
@@ -131,11 +131,17 @@ python scripts/devops.py release --dry-run
 ```
 
 `lint` and `check` run `lint-markdown check` first and stop when it fails.
-[.lint-markdown.json](../.lint-markdown.json) adds [CHANGELOG.md](../CHANGELOG.md), whose finalized entries must stay unedited, to lint-markdown's default excludes.
+[.lint-markdown.json](../.lint-markdown.json) excludes [CHANGELOG.md](../CHANGELOG.md), whose finalized entries stay unedited, and resolves `gpellicciotta` GitHub links locally.
 Add project-specific actions in `build_cli()` with `cli.add_action(name, summary, handler)`.
-See support-python's [DevOps scripts tutorial](https://github.com/gpellicciotta/support.python/blob/v2.0.0/docs/tutorials/devops-scripts.md).
-Test the script itself with `.venv/Scripts/python -m unittest discover -s scripts/tests` (`.venv/bin/python` outside Windows).
-CI installs [requirements.txt](../scripts/requirements.txt), runs those tests, then runs `python scripts/devops.py check`.
+See support-python's [DevOps scripts tutorial](https://github.com/gpellicciotta/support.python/blob/v3.1.0/docs/tutorials/devops-scripts.md).
+[pyproject.toml](../scripts/pyproject.toml) holds the `pytest` and Ruff settings for [scripts/](../scripts/), including the `slow` marker and 30-second timeout.
+Run the script checks from `.venv` (use `.venv/bin/` outside Windows):
+```shell
+.venv/Scripts/python -m pytest scripts/tests
+.venv/Scripts/python -m pytest scripts/tests -m slow --timeout=120
+.venv/Scripts/ruff check scripts
+.venv/Scripts/ruff format --check scripts
+```
 
 ### Building and Testing
 The root [gradle.properties](../gradle.properties) defines shared build defaults:
@@ -210,8 +216,8 @@ java -jar build/libs/template.java-{{version}}.jar create my-new-tool -o {{outpu
 ---
 
 ## Continuous Integration
-The GitHub Actions workflow in [ci.yml](../.github/workflows/ci.yml) triggers on push and pull requests, executing:
-- Java JDK 25 and Python 3 setup.
-- `python -m pip install -r scripts/requirements.txt`, installing support-python into the runner's Python, without a `.venv`.
-- `python -m unittest discover -s scripts/tests`, testing [devops.py](../scripts/devops.py) itself.
-- `python scripts/devops.py check`, which runs `lint-markdown check` and then `./gradlew build` (compilation, Spotless, Checkstyle, unit testing, packaging).
+The GitHub Actions workflow in [ci.yml](../.github/workflows/ci.yml) runs two jobs on push and pull requests:
+- `test-scripts` tests [scripts/](../scripts/) on Python 3.9 (`ubuntu-24.04`) and 3.x (`ubuntu-latest`) after installing [requirements.txt](../scripts/requirements.txt).
+- It runs `ruff check scripts`, `ruff format --check scripts`, and `python -m pytest scripts/tests`.
+- `test-build` sets up JDK 25 and Python 3.x, installs [requirements.txt](../scripts/requirements.txt), and runs `python scripts/devops.py check`.
+- `devops.py check` runs `lint-markdown check` and `./gradlew build` (compilation, Spotless, Checkstyle, unit tests, and JARs).
