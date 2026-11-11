@@ -24,7 +24,7 @@ Verification commands:
 
 ## Defects
 - P2: Dry-run accepts an output parent that is a regular file.
-  In [Cli.java](../../../src/main/java/myproject/Cli.java), `executeCreate` checks destination existence but skips parent-directory validation.
+  In [Cli.java](../../../../src/main/java/myproject/Cli.java), `executeCreate` checks destination existence but skips parent-directory validation.
   The real run performs that validation through `Scaffold.createProject`; dry-run bypasses it.
   This violates the requirement that dry-run fails when real-run preconditions fail.
 
@@ -39,7 +39,7 @@ Verification commands:
   The real run reports `error: Failed to create` for that parent.
 
 - P2: Invalid path syntax escapes argument validation and terminates with a stack trace and exit code 1.
-  In [Cli.java](../../../src/main/java/myproject/Cli.java), `Path.of(val)` at line 175 can throw `InvalidPathException`.
+  In [Cli.java](../../../../src/main/java/myproject/Cli.java), `Path.of(val)` at line 175 can throw `InvalidPathException`.
   `run` catches only `UncheckedIOException`; destination path construction has the same unhandled exception risk.
   Invalid argument syntax must return 2 with a concise diagnostic.
 

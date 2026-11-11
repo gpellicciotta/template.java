@@ -1,7 +1,7 @@
 ## Walkthrough & Validation
 
 ### Summary
-- [devops.md](../../../docs/devops.md) now opens with `Development Environment` and `Versioning and Releasing`.
+- [devops.md](../../../../docs/devops.md) now opens with `Development Environment` and `Versioning and Releasing`.
 - `Updating Versions` states the actual `plan` behavior: it bumps `pyproject.toml` only, not `gradle.properties`.
 - README, devops.md, and requirements.md use `{{kebab-case}}` placeholders; links target the renamed anchors.
 
