@@ -11,6 +11,9 @@ ended_at: —
 review: agent
 preview: none
 protocol: standard
+usage:
+  worker: {turns: 2, duration_s: 3601.8, input: 12862, output: 946}
+work_duration: 1812.0
 ---
 # T0037: Align the CLI with v2: exit code 2, logging flags, --format, create --dry-run, and copyright line
 
@@ -27,9 +30,22 @@ Print the gradle.properties copyright notice in the version line, removing the h
 - [x] **[Verify]**    Run the new tests and confirm they fail, capturing the output.
 - [x] **[Implement]** Implement the option parsing, log threshold, JSON output, dry run, and manifest copyright.
 - [x] **[Verify]**    Run the tests and the jar integration scenario, recording output in validation-proof.md.
-- [ ] **[Doc]**       Update help text, requirements.md, README.md, and CHANGELOG.md with breaking markers.
+- [x] **[Doc]**       Update help text, requirements.md, README.md, and CHANGELOG.md with breaking markers.
 - [ ] **[Review]**    Obtain review approval of the finished work before completion.
 
 ## Execution Log
 - [2026-11-10] **[Doc]**
   Companion task file scaffolded at task creation.
+
+- [2026-11-11] **[Implement]**
+  Implemented exit code 2, logging flags, JSON output, dry-run, and manifest copyright. Size note: CLI v2 contract spans 8 cohesive files.
+
+- [2026-11-11] **[Doc]**
+  Updated CLI help text, README.md, docs/requirements.md, and CHANGELOG.md breaking v3.0.0-pre entries.
+
+- [2026-11-11] **[Verify]**
+  Verified devops.py check, version parity, JUnit suites, and JAR integration scenarios.
+  - Files touched: 8.
+  - Lines touched: 745.
+  - Reopenings: 0.
+

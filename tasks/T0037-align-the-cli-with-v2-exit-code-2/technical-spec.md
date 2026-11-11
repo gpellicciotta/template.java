@@ -25,5 +25,6 @@
 - Integration: build the jar and run `java -jar build/libs/template.java-{{version}}.jar bogus` (exit 2), `greet Gio --format json` piped through `python -m json.tool`, and `create demo --dry-run -o {{tmp-dir}}` (no directory created).
 
 Size estimate: 8 files, 380 lines
+Size note: Option parsing, logging flags, JSON output, dry-run, tests, and docs form one cohesive CLI v2 contract update.
 
 Completion check: `.\gradlew.bat build` exits 0, plus the three jar invocations above with their exit codes.

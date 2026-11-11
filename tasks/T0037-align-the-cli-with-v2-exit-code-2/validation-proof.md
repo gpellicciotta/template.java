@@ -34,28 +34,36 @@ BUILD FAILED in 7s
 3 actionable tasks: 2 executed, 1 from cache
 ```
 
-### Green Phase Build and Unit Tests
-Command: `.\gradlew.bat build --console=plain` (exit code 0)
+### Green Phase Build, Linting, and Unit Tests
+Command: `python scripts/devops.py check` (exit code 0)
 
 ```text
-[... 32 lines omitted ...]
-Task name matched 'build'
-Selected primary task 'build' from project :
-Tasks to be executed: [task ':compileJava', task ':processResources', task ':classes', task ':jar', task ':startScripts', task ':distTar', task ':distZip', task ':javadoc', task ':javadocJar', task ':sourcesJar', task ':assemble', task ':checkstyleMain', task ':compileTestJava', task ':processTestResources', task ':testClasses', task ':checkstyleTest', task ':spotlessGroovyGradle', task ':spotlessGroovyGradleCheck', task ':spotlessJava', task ':spotlessJavaCheck', task ':spotlessCheck', task ':test', task ':check', task ':build']
-Tasks that were excluded: []
-[... 558 lines omitted ...]
-> Task :check
+[... 102 lines omitted ...]
+> Task :spotlessCheck UP-TO-DATE
+Skipping task ':spotlessCheck' as it has no actions.
+Resolve mutations for :test (Thread[#146,Execution worker Thread 6,5,main]) started.
+:test (Thread[#146,Execution worker Thread 6,5,main]) started.
+> Task :test UP-TO-DATE
+Build cache key for task ':test' is d1054402c3d6dbcd03060348bb923613
+Skipping task ':test' as it is up-to-date.
+Resolve mutations for :check (Thread[#146,Execution worker Thread 6,5,main]) started.
+:check (Thread[#147,Execution worker Thread 7,5,main]) started.
+> Task :check UP-TO-DATE
 Skipping task ':check' as it has no actions.
-Resolve mutations for :build (Thread[#380,Execution worker Thread 5,5,main]) started.
-:build (Thread[#375,included builds,5,main]) started.
-
+Resolve mutations for :build (Thread[#147,Execution worker Thread 7,5,main]) started.
+:build (Thread[#147,Execution worker Thread 7,5,main]) started.
 > Task :build
 Skipping task ':build' as it has no actions.
+BUILD SUCCESSFUL in 5s
+16 actionable tasks: 4 executed, 12 up-to-date
+```
 
-BUILD SUCCESSFUL in 14s
-16 actionable tasks: 16 executed
-Watched directory hierarchies: [C:\Dev-Projects\template.java\.plan\work\T0037-align-the-cli-with-v2-exit-code-2, C:\Dev-Projects\support.java\.plan\work\T0002-pad-the-day-in-staticfilehandler-last-modified-headers, C:\Dev-Projects\todos.server]
-Stopped 2 worker daemon(s).
+Command: `python scripts/devops.py versions` (exit code 0)
+
+```text
+Version file: 3.0.0-pre
+CHANGELOG.md: 3.0.0-pre
+Versions agree.
 ```
 
 ### Jar Integration Scenarios
@@ -104,7 +112,7 @@ Command: `java -jar build/libs/template.java-3.0.0-pre.jar greet Gio --format js
 Starting template.java v3.0.0-pre+79190e9
   command: greet Gio --format json
   config: debug=false, verbose=false, log-level=INFO, log-file=(none)
-Completed in 7ms (exit code 0)
+Completed in 6ms (exit code 0)
 {
     "name": "Gio",
     "greeting": "Hello, Gio"
@@ -123,7 +131,7 @@ Dry run: would create new project at C:\Users\giova\.gemini\antigravity-cli\brai
   - Rewrite placeholders (template.java -> demo, myproject -> demo)
   - Write fresh CHANGELOG.md for Demo at v0.1.0-pre
   - Reset gradle.properties version to 0.1.0-pre
-Completed in 31ms (exit code 0)
+Completed in 32ms (exit code 0)
 ```
 
 Command: `Test-Path C:\Users\giova\.gemini\antigravity-cli\brain\92daa5d1-a696-4603-82fb-110a1532a761\scratch\dry-run-check` (exit code 0)
