@@ -12,11 +12,10 @@ review: agent
 preview: none
 protocol: standard
 usage:
-  worker: {turns: 2, duration_s: 2839.4, input: 510648, output: 151866, cache_read: 14540486}
+  worker: {turns: 4, duration_s: 5832.4, input: 1633822, output: 286404, cache_read: 23742792}
   review: {turns: 2, duration_s: 206.2, input: 114786, output: 4802, cache_read: 804608, cache_write: 0}
-review_status: rejected
-review_round: 1
-reviewed_by: "@codex"
+review_status: pending
+review_round: 2
 work_duration: 1545.9
 ---
 # T0039: Split tests into fast and slow suites with timeouts, parallel safety, a jar end-to-end test, and leak guard
@@ -79,4 +78,7 @@ Wire `slowTest` into `check`, so `devops.py check` and CI run it, and document b
   - Files touched: 10.
   - Lines touched: 1091.
   - Reopenings: 0.
+
+- [2026-11-11] **[Review]**
+  Round 2 requested (mode: agent).
 
