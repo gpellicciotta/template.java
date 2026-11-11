@@ -13,10 +13,11 @@ preview: none
 protocol: standard
 usage:
   worker: {turns: 8, duration_s: 5376.2, input: 1014472, output: 252020, cache_read: 30949170}
-  review: {turns: 2, duration_s: 180.4, input: 95728, output: 4264, cache_read: 667136, cache_write: 0}
-work_duration: 2410.4
-review_status: pending
+  review: {turns: 4, duration_s: 370.4, input: 191454, output: 8298, cache_read: 1457152, cache_write: 0}
+work_duration: 2982.9
+review_status: rejected
 review_round: 2
+reviewed_by: "@codex"
 ---
 # T0037: Align the CLI with v2: exit code 2, logging flags, --format, create --dry-run, and copyright line
 
@@ -83,4 +84,17 @@ Print the gradle.properties copyright notice in the version line, removing the h
 
 - [2026-11-11] **[Review]**
   Round 2 requested (mode: agent).
+
+- [2026-11-11] **[Review]**
+  Round 2 rejected by @codex: [Decided]** Rejected because invalid project-name arguments still return exit code 1 instead of 2.
+  - Findings: [review-findings-2.md](T0037-align-the-cli-with-v2-exit-code-2/review-findings-2.md).
+
+- [2026-11-11] **[Implement]**
+  Added failing regression tests and classified invalid project-name package derivation as an exit code 2 argument error.
+
+- [2026-11-11] **[Verify]**
+  Verified devops.py check, regression tests, and Round 2 review JAR probes.
+  - Files touched: 8.
+  - Lines touched: 880.
+  - Reopenings: 0.
 

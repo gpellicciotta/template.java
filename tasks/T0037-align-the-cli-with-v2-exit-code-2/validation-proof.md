@@ -219,3 +219,60 @@ Command: `java -jar build/libs/template.java-3.0.0-pre.jar create 'bad|name'; ex
 ```text
 **[ERROR]** error: invalid project-name 'bad|name': Illegal char <|>
 ```
+
+### Review Round 2 Rework
+Command: `.\gradlew.bat test --tests myproject.CliTest.createInvalidProjectNameReturnsTwoInDryRunAndRealExecution --console=plain` (exit code 1)
+
+```text
+[... 72 lines omitted ...]
+> Task :test FAILED
+
+CliTest > createInvalidProjectNameReturnsTwoInDryRunAndRealExecution(Path) FAILED
+    org.opentest4j.AssertionFailedError: expected exit 2 for args: create 123 --dry-run -o C:\Users\giova\AppData\Local\Temp\junit-12152055951865405506 ==> expected: <2> but was: <1>
+        at app//org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:601)
+        at app//myproject.CliTest.createInvalidProjectNameReturnsTwoInDryRunAndRealExecution(CliTest.java:423)
+
+1 test completed, 1 failed
+
+BUILD FAILED in 5s
+3 actionable tasks: 2 executed, 1 up-to-date
+```
+
+Command: `python scripts/devops.py check` (exit code 0)
+
+```text
+[... 140 lines omitted ...]
+Stored cache entry for task ':test' with cache key 810cd0301a3200b758df31b848ee00fe
+Resolve mutations for :check (Thread[#873,Execution worker Thread 7,5,main]) started.
+:check (Thread[#873,Execution worker Thread 7,5,main]) started.
+> Task :check
+Skipping task ':check' as it has no actions.
+Resolve mutations for :build (Thread[#873,Execution worker Thread 7,5,main]) started.
+:build (Thread[#873,Execution worker Thread 7,5,main]) started.
+> Task :build
+Skipping task ':build' as it has no actions.
+BUILD SUCCESSFUL in 10s
+16 actionable tasks: 7 executed, 9 up-to-date
+```
+
+Command: `java -jar build/libs/template.java-3.0.0-pre.jar create 123 --dry-run; exit $LASTEXITCODE` (exit code 2)
+
+```text
+**[ERROR]** error: Cannot derive a valid Java package name from '123'.
+```
+
+Command: `java -jar build/libs/template.java-3.0.0-pre.jar create 123; exit $LASTEXITCODE` (exit code 2)
+
+```text
+**[ERROR]** error: Cannot derive a valid Java package name from '123'.
+```
+
+Command: `java -jar build/libs/template.java-3.0.0-pre.jar create review-probe --dry-run -o gradle.properties; exit $LASTEXITCODE` (exit code 1)
+
+```text
+Starting template.java v3.0.0-pre+b1c5936
+  command: create review-probe --dry-run -o gradle.properties
+  config: debug=false, verbose=false, log-level=INFO, log-file=(none)
+**[ERROR]** error: Output parent C:\Dev-Projects\template.java\.plan\work\T0037-align-the-cli-with-v2-exit-code-2\gradle.properties exists and is not a directory.
+Completed in 21ms (exit code 1)
+```
