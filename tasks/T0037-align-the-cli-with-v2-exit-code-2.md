@@ -12,8 +12,10 @@ review: agent
 preview: none
 protocol: standard
 usage:
-  worker: {turns: 4, duration_s: 4255.6, input: 817250, output: 200460, cache_read: 23091774}
+  worker: {turns: 6, duration_s: 4490.2, input: 864886, output: 207334, cache_read: 24729568}
 work_duration: 2167.3
+review_status: pending
+review_round: 1
 ---
 # T0037: Align the CLI with v2: exit code 2, logging flags, --format, create --dry-run, and copyright line
 
@@ -61,4 +63,7 @@ Print the gradle.properties copyright notice in the version line, removing the h
 
 - [2026-11-11] **[Verify]**
   Added missing red-phase execution log entries and verified completion validation.
+
+- [2026-11-11] **[Review]**
+  Round 1 requested (mode: agent).
 
