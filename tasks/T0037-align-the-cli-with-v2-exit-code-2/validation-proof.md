@@ -276,3 +276,69 @@ Starting template.java v3.0.0-pre+b1c5936
 **[ERROR]** error: Output parent C:\Dev-Projects\template.java\.plan\work\T0037-align-the-cli-with-v2-exit-code-2\gradle.properties exists and is not a directory.
 Completed in 21ms (exit code 1)
 ```
+
+## Round 4 Rework: Dry Run Writes No Log File
+
+Red phase: `.\gradlew.bat test --tests myproject.CliTest.createDryRunDoesNotWriteTheLogFile` exited 1.
+
+```text
+CliTest > createDryRunDoesNotWriteTheLogFile(Path) FAILED
+    org.opentest4j.AssertionFailedError: expected: <false> but was: <true>
+BUILD FAILED in 3s
+```
+
+Green phase: `.venv/Scripts/python scripts/devops.py check` exited 0.
+
+```text
+BUILD SUCCESSFUL in 10s
+```
+
+Command: `java -jar build/libs/template.java-3.0.0-pre.jar create demo --dry-run --format json --log-file {{tmp-dir}}/x.log -o {{tmp-dir}}/o` (exit code 0)
+
+```text
+**[WARN]**  --log-file is ignored in a dry run: nothing is written
+```
+
+Neither `x.log` nor `o` existed afterward.
+
+## Round 5 Rework: Path Options Reject Option-Like Values
+
+Red phase: `.\gradlew.bat test --tests myproject.CliTest.pathOptionsRejectAFollowingFlagAsTheirValue` exited 1.
+
+```text
+CliTest > pathOptionsRejectAFollowingFlagAsTheirValue(Path) FAILED
+    org.opentest4j.AssertionFailedError: expected exit 2 for args: create demo -o --dry-run ==> expected: <2> but was: <1>
+BUILD FAILED in 1m 55s
+```
+
+The red run created a recursive `--dry-run/demo/...` tree in the worktree, since removed.
+The final test keeps `--dry-run` before `-o`, so a regression writes no project.
+
+Green phase: `.venv/Scripts/python scripts/devops.py check` exited 0, with 30 CliTest cases passing.
+
+```text
+BUILD SUCCESSFUL in 22s
+```
+
+JAR probes from an empty temporary directory, which stayed empty:
+
+```text
+$ java -jar build/libs/template.java-3.0.0-pre.jar create demo -o --dry-run   -> exit 2
+**[ERROR]** error: '-o' requires a directory argument
+$ java -jar build/libs/template.java-3.0.0-pre.jar greet Gio --log-file --debug   -> exit 2
+**[ERROR]** error: '--log-file' requires a path argument
+```
+
+## Merge with Main After T0038 and T0040
+
+`git merge main` conflicted in `CHANGELOG.md` and `Log.java`; both sides were kept.
+`Log` now combines the level threshold and stderr routing with T0038's injectable UTC clock.
+The shared `.venv` was refreshed to support-python v3.1.0, which main now pins.
+
+Command: `.venv/Scripts/python scripts/devops.py check` (exit code 0)
+
+```text
+All 9 markdown files passed linting.
+BUILD SUCCESSFUL in 15s
+CliTest 30, CoreTest 1, LogTest 9, ScaffoldTest 2 tests; 0 failures, 0 errors
+```
