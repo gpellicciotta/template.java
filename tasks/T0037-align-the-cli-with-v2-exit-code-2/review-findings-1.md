@@ -3,7 +3,7 @@ task: T0037
 round: 1
 verdict: rejected
 reviewer: "@codex"
-reviewed_at: 2026-11-11T08:50:36Z
+reviewed_at: 2026-11-11T08:52:08Z
 reviewed_commit: "0be6a9b"
 base_commit: "e5840a7"
 branch: task/T0037-align-the-cli-with-v2-exit-code-2

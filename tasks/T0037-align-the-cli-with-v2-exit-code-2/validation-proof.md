@@ -139,3 +139,83 @@ Command: `Test-Path C:\Users\giova\.gemini\antigravity-cli\brain\92daa5d1-a696-4
 ```text
 False
 ```
+
+### Review Round 1 Rework
+Command: `.\gradlew.bat test --tests myproject.CliTest.invalidPathArgumentsReturnTwoWithoutThrowing --tests myproject.CliTest.createRejectsNonDirectoryOutputAncestorInDryRunAndRealExecution --console=plain` (exit code 1)
+
+```text
+[... 72 lines omitted ...]
+> Task :test FAILED
+
+CliTest > createRejectsNonDirectoryOutputAncestorInDryRunAndRealExecution(Path) FAILED
+    org.opentest4j.AssertionFailedError: expected exit 1 for args: create demo-app --dry-run -o C:\Users\giova\AppData\Local\Temp\junit-8579763967409569379\regular-file.txt ==> expected: <1> but was: <0>
+        at app//org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:601)
+        at app//myproject.CliTest.createRejectsNonDirectoryOutputAncestorInDryRunAndRealExecution(CliTest.java:406)
+
+CliTest > invalidPathArgumentsReturnTwoWithoutThrowing() FAILED
+    java.nio.file.InvalidPathException: Illegal char < > at index 3: bad path
+        at java.base/sun.nio.fs.WindowsPathParser.normalize(WindowsPathParser.java:191)
+        at java.base/sun.nio.fs.WindowsPathParser.parse(WindowsPathParser.java:142)
+        at java.base/sun.nio.fs.WindowsPathParser.parse(WindowsPathParser.java:46)
+        at java.base/sun.nio.fs.WindowsPath.parse(WindowsPath.java:92)
+        at java.base/sun.nio.fs.WindowsFileSystem.getPath(WindowsFileSystem.java:203)
+        at java.base/java.nio.file.Path.of(Path.java:148)
+        at myproject.Cli.parseAndDispatch(Cli.java:175)
+        at myproject.Cli.run(Cli.java:132)
+        at myproject.CliTest.runAndGetExitCode(CliTest.java:34)
+        at myproject.CliTest.invalidPathArgumentsReturnTwoWithoutThrowing(CliTest.java:377)
+
+2 tests completed, 2 failed
+
+BUILD FAILED in 6s
+3 actionable tasks: 2 executed, 1 up-to-date
+```
+
+Command: `python scripts/devops.py check` (exit code 0)
+
+```text
+[... 324 lines omitted ...]
+Stored cache entry for task ':checkstyleTest' with cache key 5a2294f785fab62bb38fb65d2438a8f4
+Resolve mutations for :check (Thread[#312,included builds,5,main]) started.
+:check (Thread[#312,included builds,5,main]) started.
+> Task :check
+Skipping task ':check' as it has no actions.
+Resolve mutations for :build (Thread[#312,included builds,5,main]) started.
+:build (Thread[#312,included builds,5,main]) started.
+> Task :build
+Skipping task ':build' as it has no actions.
+BUILD SUCCESSFUL in 14s
+16 actionable tasks: 12 executed, 4 up-to-date
+```
+
+Command: `java -jar build/libs/template.java-3.0.0-pre.jar create review-probe --dry-run -o gradle.properties; exit $LASTEXITCODE` (exit code 1)
+
+```text
+Starting template.java v3.0.0-pre+0be6a9b
+  command: create review-probe --dry-run -o gradle.properties
+  config: debug=false, verbose=false, log-level=INFO, log-file=(none)
+**[ERROR]** error: Output parent C:\Dev-Projects\template.java\.plan\work\T0037-align-the-cli-with-v2-exit-code-2\gradle.properties exists and is not a directory.
+Completed in 22ms (exit code 1)
+```
+
+Command: `java -jar build/libs/template.java-3.0.0-pre.jar create review-probe -o gradle.properties; exit $LASTEXITCODE` (exit code 1)
+
+```text
+Starting template.java v3.0.0-pre+0be6a9b
+  command: create review-probe -o gradle.properties
+  config: debug=false, verbose=false, log-level=INFO, log-file=(none)
+**[ERROR]** error: Output parent C:\Dev-Projects\template.java\.plan\work\T0037-align-the-cli-with-v2-exit-code-2\gradle.properties exists and is not a directory.
+Completed in 24ms (exit code 1)
+```
+
+Command: `java -jar build/libs/template.java-3.0.0-pre.jar greet --log-file 'bad|path'; exit $LASTEXITCODE` (exit code 2)
+
+```text
+**[ERROR]** error: invalid --log-file path 'bad|path': Illegal char <|>
+```
+
+Command: `java -jar build/libs/template.java-3.0.0-pre.jar create 'bad|name'; exit $LASTEXITCODE` (exit code 2)
+
+```text
+**[ERROR]** error: invalid project-name 'bad|name': Illegal char <|>
+```
