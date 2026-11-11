@@ -5,15 +5,16 @@ session: antigravity-20261111-8f71bc
 needs: []
 branch: task/T0040-move-the-devops-script-tests-to-pytest-add
 worktree: .plan/work/T0040-move-the-devops-script-tests-to-pytest-add
-status: active
+status: completed
 started_at: "2026-11-11T09:21:42Z"
-ended_at: —
+ended_at: "2026-11-11T13:21:59Z"
 review: none
 preview: none
 protocol: adhoc
 usage:
-  worker: {turns: 2, duration_s: 2678.4, input: 575338, output: 119218, cache_read: 19038628}
-work_duration: 1355.9
+  worker: {turns: 4, duration_s: 3143.2, input: 1074568, output: 125158, cache_read: 22264942}
+work_duration: 14417.3
+completion-commit: 1f2d9929603579561496b603888b6912d379667f
 ---
 # T0040: Move the devops script tests to pytest, add Ruff checks, and test the minimum supported Python in CI
 
@@ -61,4 +62,7 @@ Update the commands in devops.md, AGENTS.md, and README.md.
   - Files touched: 11.
   - Lines touched: 289.
   - Reopenings: 0.
+
+- [2026-11-11] **[Complete]**
+  Task completed successfully.
 
