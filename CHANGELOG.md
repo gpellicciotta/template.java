@@ -13,6 +13,7 @@ A summarized overview of all changes, per version of this project.
 ---
 
 ## v3.0.0-pre
+- CLI: Formatted `--log-file` timestamps in UTC in [Log.java](src/main/java/myproject/Log.java) and accepted an injectable `Clock` in `Log.configure`.
 - Docs: Moved the [multi-module](docs/tutorials/multi-module.md) and [library publishing](docs/tutorials/library-publishing.md) guides into `docs/tutorials/`.
 - Docs: Replaced bold bullet labels with plain bullets and linked repository file names in the README, agent instructions, and docs.
 - Docs: Restructured [devops.md](docs/devops.md) to open with environment, versioning, and release steps, and adopted `{{kebab-case}}` placeholders across the docs.

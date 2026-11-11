@@ -9,6 +9,9 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,6 +23,10 @@ class LogTest {
 
   private void configure(boolean debug, Path logFile) throws Exception {
     Log.configure(debug, logFile, new PrintStream(outBuf, true, "UTF-8"), new PrintStream(errBuf, true, "UTF-8"));
+  }
+
+  private void configure(boolean debug, Path logFile, Clock clock) throws Exception {
+    Log.configure(debug, logFile, new PrintStream(outBuf, true, "UTF-8"), new PrintStream(errBuf, true, "UTF-8"), clock);
   }
 
   @AfterEach
@@ -64,6 +71,17 @@ class LogTest {
 
     String logged = Files.readString(logFile, StandardCharsets.UTF_8);
     assertTrue(logged.matches("(?s)^\\[\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\] \\*\\*\\[INFO\\]\\*\\*\\s+started up.*"));
+  }
+
+  @Test
+  void fileEntriesUseUtcTimestampsRegardlessOfClockZone(@TempDir Path tmpDir) throws Exception {
+    Path logFile = tmpDir.resolve("app.log");
+    Clock nonUtcClock = Clock.fixed(Instant.parse("2026-11-11T23:15:30Z"), ZoneOffset.ofHours(2));
+    configure(false, logFile, nonUtcClock);
+    Log.info("started up");
+
+    String logged = Files.readString(logFile, StandardCharsets.UTF_8);
+    assertEquals("[2026-11-11 23:15:30] **[INFO]**  started up" + System.lineSeparator(), logged);
   }
 
   @Test

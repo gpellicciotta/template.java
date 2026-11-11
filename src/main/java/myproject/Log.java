@@ -7,8 +7,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.time.LocalDateTime;
+import java.time.Clock;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  * Minimal reference logging implementation, just enough to satisfy the cross-project logging guideline:
@@ -32,19 +34,28 @@ public final class Log {
     DEBUG
   }
 
-  private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+  private static final DateTimeFormatter TIMESTAMP_FORMAT =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneOffset.UTC);
 
   private static volatile boolean debugEnabled = false;
   private static volatile Path logFile = null;
   private static volatile PrintStream out = System.out;
   private static volatile PrintStream err = System.err;
+  private static volatile Clock clock = Clock.systemUTC();
 
   /** (Re)configure the sink; called once per {@code Cli.run} so state never leaks across invocations. */
   public static void configure(boolean debug, Path file, PrintStream outStream, PrintStream errStream) {
+    configure(debug, file, outStream, errStream, Clock.systemUTC());
+  }
+
+  /** (Re)configure the sink with an explicit clock; timestamps are still formatted in UTC regardless of clock zone. */
+  public static void configure(
+      boolean debug, Path file, PrintStream outStream, PrintStream errStream, Clock timeSource) {
     debugEnabled = debug;
     logFile = file;
     out = outStream;
     err = errStream;
+    clock = Objects.requireNonNull(timeSource, "timeSource");
   }
 
   /** Logs an error message. */
@@ -125,7 +136,7 @@ public final class Log {
 
     Path file = logFile;
     if (file != null) {
-      String timestamp = "[" + TIMESTAMP_FORMAT.format(LocalDateTime.now()) + "] ";
+      String timestamp = "[" + TIMESTAMP_FORMAT.format(clock.instant()) + "] ";
       String filePrefix = timestamp + indicator(level) + " " + originTag;
       String fileLine = withIndentedContinuations(filePrefix, message);
       try {
