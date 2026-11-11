@@ -12,7 +12,7 @@ A summarized overview of all changes, per version of this project.
 
 ---
 
-## v3.0.0-pre
+## v3.0.0 [released: 2026-11-11]
 - DevEx: Split [build.gradle](build.gradle) tests into parallel `test` and `slowTest` suites with timeouts, [JarEndToEndTest.java](src/test/java/myproject/JarEndToEndTest.java), and [StateLeakGuard.java](src/test/java/myproject/StateLeakGuard.java).
 - CLI: **[breaking]** Returned exit code `2` on invalid arguments and printed the [gradle.properties](gradle.properties) `Copyright` notice in `version`.
 - CLI: Added `--log-level`, `-v`/`--verbose`, `--format text|json`, and `create --dry-run` to [Cli.java](src/main/java/myproject/Cli.java) and [Log.java](src/main/java/myproject/Log.java).
