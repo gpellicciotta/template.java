@@ -12,8 +12,8 @@ review: agent
 preview: none
 protocol: standard
 usage:
-  worker: {turns: 2, duration_s: 3601.8, input: 12862, output: 946}
-work_duration: 1812.0
+  worker: {turns: 4, duration_s: 4255.6, input: 817250, output: 200460, cache_read: 23091774}
+work_duration: 2167.3
 ---
 # T0037: Align the CLI with v2: exit code 2, logging flags, --format, create --dry-run, and copyright line
 
@@ -38,6 +38,12 @@ Print the gradle.properties copyright notice in the version line, removing the h
   Companion task file scaffolded at task creation.
 
 - [2026-11-11] **[Implement]**
+  Authored failing CliTest and LogTest cases for exit code 2, logging flags, JSON format, dry-run, and manifest copyright.
+
+- [2026-11-11] **[Verify]**
+  Confirmed red-phase failures across 12 CliTest cases and LogTest compilation before production edits.
+
+- [2026-11-11] **[Implement]**
   Implemented exit code 2, logging flags, JSON output, dry-run, and manifest copyright. Size note: CLI v2 contract spans 8 cohesive files.
 
 - [2026-11-11] **[Doc]**
@@ -48,4 +54,11 @@ Print the gradle.properties copyright notice in the version line, removing the h
   - Files touched: 8.
   - Lines touched: 745.
   - Reopenings: 0.
+
+- [2026-11-11] **[Verify]**
+  Completion validation found 1 errors; pending fix turn 1 of 2.
+  - TF020.
+
+- [2026-11-11] **[Verify]**
+  Added missing red-phase execution log entries and verified completion validation.
 
