@@ -1,11 +1,12 @@
 ---
 id: T0037
-owner: ~
+owner: "@gemini"
+session: antigravity-20261111-5a7e0d
 needs: []
-branch: —
-worktree: —
-status: ready
-started_at: —
+branch: task/T0037-align-the-cli-with-v2-exit-code-2
+worktree: .plan/work/T0037-align-the-cli-with-v2-exit-code-2
+status: active
+started_at: "2026-11-11T08:12:00Z"
 ended_at: —
 review: agent
 preview: none
@@ -22,10 +23,10 @@ Add `create --dry-run`, listing planned changes without writing anything.
 Print the gradle.properties copyright notice in the version line, removing the hardcoded author fallback in Cli.java.
 
 ## Task Execution Steps
-- [ ] **[Implement]** Author failing CliTest and LogTest cases for exit codes, logging flags, formats, dry run, and copyright.
-- [ ] **[Verify]**    Run the new tests and confirm they fail, capturing the output.
-- [ ] **[Implement]** Implement the option parsing, log threshold, JSON output, dry run, and manifest copyright.
-- [ ] **[Verify]**    Run the tests and the jar integration scenario, recording output in validation-proof.md.
+- [x] **[Implement]** Author failing CliTest and LogTest cases for exit codes, logging flags, formats, dry run, and copyright.
+- [x] **[Verify]**    Run the new tests and confirm they fail, capturing the output.
+- [x] **[Implement]** Implement the option parsing, log threshold, JSON output, dry run, and manifest copyright.
+- [x] **[Verify]**    Run the tests and the jar integration scenario, recording output in validation-proof.md.
 - [ ] **[Doc]**       Update help text, requirements.md, README.md, and CHANGELOG.md with breaking markers.
 - [ ] **[Review]**    Obtain review approval of the finished work before completion.
 
