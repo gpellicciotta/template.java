@@ -114,7 +114,7 @@ The general `.jar` rule also protects the Gradle wrapper JAR.
 ### Deploying a Service
 This template ships as a standalone CLI jar with no production service, so [devops.py](../scripts/devops.py) has no `deploy` action.
 Derived projects that deploy a service enable it with `DevopsCli.set_deploy` in `build_cli()`, keeping the deploy steps project-local.
-See the [CLI guidelines](https://github.com/gpellicciotta/dev-guidelines/blob/main/guidelines/cli-guidelines.md#devops-scripts).
+See the `cli-guidelines` skill, section "DevOps Scripts".
 
 ### Operations Runner `devops.py`
 [devops.py](../scripts/devops.py) is the single entry point to typical operations; run `python scripts/devops.py help --verbose`.
@@ -201,7 +201,7 @@ See Gradle's [incremental build](https://docs.gradle.org/current/userguide/incre
 
 ### Task Coordination Protocol
 Tasks live in `PLAN.md` and `.plan/tasks/` and are managed only through the `plan` CLI; see [AGENTS.md](../AGENTS.md) and the
-[cross-project development guidelines](https://github.com/gpellicciotta/dev-guidelines).
+the private `dev-guidelines` repository.
 Mainline is `main`.
 
 ---

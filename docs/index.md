@@ -17,4 +17,4 @@ Overview of all documentation and specifications for this project.
 ---
 
 ## Guidelines
-- [Cross-Project Development Guidelines](https://github.com/gpellicciotta/dev-guidelines): Universal standards, language guidelines, and task coordination protocols.
+- Cross-Project Development Guidelines (private `dev-guidelines` repository): Universal standards, language guidelines, and task coordination protocols.
