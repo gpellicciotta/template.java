@@ -12,12 +12,11 @@ review: agent
 preview: none
 protocol: standard
 usage:
-  worker: {turns: 6, duration_s: 4490.2, input: 864886, output: 207334, cache_read: 24729568}
+  worker: {turns: 8, duration_s: 5376.2, input: 1014472, output: 252020, cache_read: 30949170}
   review: {turns: 2, duration_s: 180.4, input: 95728, output: 4264, cache_read: 667136, cache_write: 0}
 work_duration: 2410.4
-review_status: rejected
-review_round: 1
-reviewed_by: "@codex"
+review_status: pending
+review_round: 2
 ---
 # T0037: Align the CLI with v2: exit code 2, logging flags, --format, create --dry-run, and copyright line
 
@@ -81,4 +80,7 @@ Print the gradle.properties copyright notice in the version line, removing the h
   - Files touched: 8.
   - Lines touched: 835.
   - Reopenings: 0.
+
+- [2026-11-11] **[Review]**
+  Round 2 requested (mode: agent).
 
