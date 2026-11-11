@@ -13,6 +13,8 @@ A summarized overview of all changes, per version of this project.
 ---
 
 ## v3.0.0-pre
+- CLI: **[breaking]** Returned exit code `2` on invalid arguments and printed the [gradle.properties](gradle.properties) `Copyright` notice in `version`.
+- CLI: Added `--log-level`, `-v`/`--verbose`, `--format text|json`, and `create --dry-run` to [Cli.java](src/main/java/myproject/Cli.java) and [Log.java](src/main/java/myproject/Log.java).
 - DevEx: Moved [test_devops.py](scripts/tests/test_devops.py) to `pytest`, added Ruff checks in [pyproject.toml](scripts/pyproject.toml), tested Python 3.9 in [ci.yml](.github/workflows/ci.yml), and pinned support-python v3.1.0.
 - CLI: Formatted `--log-file` timestamps in UTC in [Log.java](src/main/java/myproject/Log.java) and accepted an injectable `Clock` in `Log.configure`.
 - Docs: Moved the [multi-module](docs/tutorials/multi-module.md) and [library publishing](docs/tutorials/library-publishing.md) guides into `docs/tutorials/`.

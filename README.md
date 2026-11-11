@@ -100,30 +100,33 @@ This initializes a git repo (if one doesn't already exist), installs [requiremen
 
 ## CLI
 ```powershell
-java -jar build/libs/template.java-{{version}}.jar help
+java -jar build/libs/template.java-{{version}}.jar help [--verbose]
 java -jar build/libs/template.java-{{version}}.jar version
-java -jar build/libs/template.java-{{version}}.jar greet {{name}}
-java -jar build/libs/template.java-{{version}}.jar create {{project-name}} [-o {{output-dir}}]
+java -jar build/libs/template.java-{{version}}.jar greet [{{name}}] [--format text|json]
+java -jar build/libs/template.java-{{version}}.jar create {{project-name}} [-o {{output-dir}}] [--dry-run] [--format text|json]
 ```
 
-`create` scaffolds a new project as a copy of this template at `{{output-dir}}/{{project-name}}` (current directory if `-o` is omitted), automating the renames described below in [Starting a new project from this template](#starting-a-new-project-from-this-template). Run it from within a checkout of this template (i.e. after `python scripts/bootstrap-dev-environment.py` or `gradlew build` in this repo). `create` locates the template root by walking up from wherever its own compiled class was loaded from.
+`create` scaffolds a renamed copy of this template at `{{output-dir}}/{{project-name}}`, defaulting to the current directory.
+Pass `--dry-run` to list planned changes without writing files, including any `--log-file`, or `--format json` to print one JSON document on `stdout`.
+Run `create` from within a checkout of this template after running [bootstrap-dev-environment.py](scripts/bootstrap-dev-environment.py) or `gradlew build`.
+Exit codes are `0` on success, `1` on runtime errors, and `2` on invalid commands, arguments, or options.
 
-For a development run without building or naming the jar, use `.\gradlew.bat run --args="{{command}} {{args}}"`.
+For a development run without naming the jar, use `.\gradlew.bat run --args="{{command}} {{args}}"`.
 
 ## Logging
-`greet` and `create` log a startup message (name, version, command, config) and a completion summary (duration,
-exit code) via [Log.java](src/main/java/myproject/Log.java), a minimal reference implementation of the cross-project logging guideline:
+`greet` and `create` log startup and completion summaries via [Log.java](src/main/java/myproject/Log.java):
 
 ```powershell
 java -jar build/libs/template.java-{{version}}.jar --debug --log-file app.log greet Gio
 ```
 
-- `--debug` enables `DEBUG`-level messages (discarded by default).
-- `--log-file {{path}}` appends timestamped, formatted log lines to `{{path}}` in addition to the console.
-- Console output omits timestamps and the `INFO` severity indicator; `--log-file` entries always carry both.
+- `-v` / `--verbose` emits `INFO` progress detail without changing the log threshold.
+- `--debug` sets the log threshold to `DEBUG` and implies `--verbose`.
+- `--log-level {{level}}` sets the threshold (`DEBUG`, `INFO`, `WARN`, `ERROR`), overriding `--debug` on console and file alike.
+- `--log-file {{path}}` appends timestamped, formatted log lines to `{{path}}` alongside console output.
+- `--format json` routes all log entries to `stderr` so `stdout` holds only the JSON document.
 
-`help` and `version` stay single-line and scriptable and never emit log lines. Call `Log.error`/`Log.warn`/
-`Log.info`/`Log.debug` directly from your own business logic to log more than the CLI's own start/stop events.
+`help` and `version` stay unlogged. Call `Log.error`, `Log.warn`, `Log.info`, and `Log.debug` directly from business logic.
 
 ## Building the Jar
 ```powershell

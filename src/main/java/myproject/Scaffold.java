@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -36,6 +37,14 @@ public final class Scaffold {
   private static final String INITIAL_VERSION = "0.1.0-pre";
 
   // Tracked files only: plan data lives on the separate plan branch, so CI checkouts have no PLAN.md.
+  private static final Set<String> JAVA_KEYWORDS = Set.of(
+      "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const",
+      "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float",
+      "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native",
+      "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp",
+      "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void",
+      "volatile", "while", "true", "false", "null", "_"
+  );
   private static final List<String> MARKER_FILES = List.of("build.gradle", "settings.gradle", "CHANGELOG.md");
   // The template's plan store is not inherited; new projects create their own with `plan init --store branch`.
   // The root PLAN.md is an untracked link into .plan/, dangling when .plan/ is absent.
@@ -77,11 +86,24 @@ public final class Scaffold {
     );
   }
 
-  private static String toPackageName(String projectName) throws ScaffoldException {
+  /**
+   * Derives the Java package name for a project name, independent of the default locale.
+   *
+   * @return the package name, or {@code null} when none can be derived
+   */
+  static String derivePackageName(String projectName) {
     String packageName = projectName.replaceAll("[^0-9a-zA-Z]+", "_")
                                      .replaceAll("^_+|_+$", "")
-                                     .toLowerCase();
-    if (!Pattern.matches("^[a-z_][a-z0-9_]*$", packageName)) {
+                                     .toLowerCase(Locale.ROOT);
+    if (!Pattern.matches("^[a-z_][a-z0-9_]*$", packageName) || JAVA_KEYWORDS.contains(packageName)) {
+      return null;
+    }
+    return packageName;
+  }
+
+  private static String toPackageName(String projectName) throws ScaffoldException {
+    String packageName = derivePackageName(projectName);
+    if (packageName == null) {
       throw new ScaffoldException("Cannot derive a valid Java package name from '" + projectName + "'.");
     }
     return packageName;
@@ -97,7 +119,7 @@ public final class Scaffold {
       if (title.length() > 0) {
         title.append(' ');
       }
-      title.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1).toLowerCase());
+      title.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1).toLowerCase(Locale.ROOT));
     }
     return title.toString();
   }

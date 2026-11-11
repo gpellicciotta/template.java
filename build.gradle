@@ -4,9 +4,10 @@ plugins {
   alias(libs.plugins.spotless)
 }
 
-// group, version, and author are read from gradle.properties - the single source of truth, read back at
-// runtime via the jar manifest, see Cli.java.
-ext.vendor = author // Copyright name for the jar manifest - see Cli.java
+// group, version, author, and copyright are read from gradle.properties - the single source of truth, read back
+// at runtime via the jar manifest, see Cli.java.
+ext.vendor = author
+ext.copyright = copyright
 
 repositories {
   mavenCentral()
@@ -95,12 +96,11 @@ def gitCommitHash = {
 // same -pre version stay individually traceable back to the commit that produced them:
 def implementationVersion = gitCommitHash ? "${project.version}+${gitCommitHash}" : project.version.toString()
 
-// Stamps the resolved project version (and vendor/copyright name) into the jar manifest so Cli.java can read
-// them back at runtime via Package.getImplementationVersion()/getImplementationVendor() - this is the single
-// source of truth, there is no second hardcoded version/name string to keep in sync (mirrors the Python
-// template's importlib.metadata.version() approach). Main-Class makes the plain jar directly runnable via
-// `java -jar` (the 'application' plugin's own mainClass setting only wires up the 'run' task and the generated
-// start scripts, not the jar's own manifest).
+// Stamps the resolved project version, vendor, and copyright notice into the jar manifest so Cli.java can read
+// them back at runtime - this is the single source of truth, with no hardcoded version/author strings to keep in
+// sync (mirrors the Python template's importlib.metadata.version() approach). Main-Class makes the plain jar
+// directly runnable via `java -jar` (the 'application' plugin's own mainClass setting only wires up the 'run'
+// task and the generated start scripts, not the jar's own manifest).
 jar {
   manifest {
     attributes(
@@ -108,6 +108,7 @@ jar {
       'Implementation-Title':    project.name,
       'Implementation-Version':  implementationVersion,
       'Implementation-Vendor':   project.ext.vendor,
+      'Copyright':               project.ext.copyright,
       // Deliberately changes on each configuration: prefer build traceability over identical JAR bytes.
       'Build-Time':              java.time.Instant.now().toString()
     )

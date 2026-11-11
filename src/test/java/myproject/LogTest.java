@@ -103,4 +103,43 @@ class LogTest {
     String logged = Files.readString(logFile, StandardCharsets.UTF_8);
     assertTrue(logged.contains("<Scaffold> copying files"));
   }
+
+  @Test
+  void levelThresholdFiltersConsoleAndFileIdentically(@TempDir Path tmpDir) throws Exception {
+    Path logFile = tmpDir.resolve("app.log");
+    Log.configure(Log.Level.WARN, logFile, new PrintStream(outBuf, true, "UTF-8"),
+        new PrintStream(errBuf, true, "UTF-8"), false);
+
+    Log.debug("debug detail");
+    Log.info("info detail");
+    Log.warn("warn detail");
+    Log.error("error detail");
+
+    assertEquals("", outBuf.toString(StandardCharsets.UTF_8));
+    String errOut = errBuf.toString(StandardCharsets.UTF_8);
+    assertTrue(errOut.contains("**[WARN]**  warn detail"));
+    assertTrue(errOut.contains("**[ERROR]** error detail"));
+    assertFalse(errOut.contains("info detail"));
+    assertFalse(errOut.contains("debug detail"));
+
+    String fileOut = Files.readString(logFile, StandardCharsets.UTF_8);
+    assertTrue(fileOut.contains("**[WARN]**  warn detail"));
+    assertTrue(fileOut.contains("**[ERROR]** error detail"));
+    assertFalse(fileOut.contains("info detail"));
+    assertFalse(fileOut.contains("debug detail"));
+  }
+
+  @Test
+  void allToStderrRoutesInfoAndDebugToErrorStream() throws Exception {
+    Log.configure(Log.Level.DEBUG, null, new PrintStream(outBuf, true, "UTF-8"),
+        new PrintStream(errBuf, true, "UTF-8"), true);
+
+    Log.info("info on err");
+    Log.debug("debug on err");
+
+    assertEquals("", outBuf.toString(StandardCharsets.UTF_8));
+    String errOut = errBuf.toString(StandardCharsets.UTF_8);
+    assertTrue(errOut.contains("info on err"));
+    assertTrue(errOut.contains("**[DEBUG]** debug on err"));
+  }
 }

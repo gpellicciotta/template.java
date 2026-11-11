@@ -16,11 +16,11 @@ Functional and technical requirements for the `template.java` project.
 
 ### CLI Entry Point
 - Provide a subcommand-driven CLI supporting standard commands:
-  - `help` (and `--help`, `-h`): displays tool version, description, usage, and exit codes.
+  - `help` (and `--help`, `-h`, `help --verbose`): displays version, description, usage, options, details, and exit codes.
   - `version` (and `--version`): displays `{{name}} v{{version}} - {{copyright}}` in a single line.
-  - `greet [name]`: sample business logic action demonstrating CLI-to-core dispatch.
-  - `create {{project-name}} [-o {{output-dir}}]`: scaffolds a new project as a renamed copy of the template.
-- Exit with code 0 on successful command completion or help/version invocation; exit with non-zero on errors.
+  - `greet [{{name}}] [--format text|json]`: runs sample greeting logic and prints text or one JSON document.
+  - `create {{project-name}} [-o {{output-dir}}] [--dry-run] [--format text|json]`: scaffolds a renamed project copy or previews planned changes.
+- Exit with code 0 on success, code 1 on runtime errors, and code 2 on invalid arguments or options.
 
 ### Core Logic Separation
 - Maintain clear separation between CLI parsing/IO (`myproject.Cli`), business logic (`myproject.Core`), and template scaffolding machinery (`myproject.Scaffold`).
@@ -34,12 +34,11 @@ Functional and technical requirements for the `template.java` project.
 - Prevent accidental overwrite when target directories already exist.
 
 ### Logging
-- Provide a minimal reference logging implementation (`myproject.Log`) satisfying the cross-project logging
-  guideline: formatted, timestamped log lines, level gating, and an optional append-only log file.
-- Support `--debug` (enables `DEBUG`-level messages, discarded by default) and `--log-file {{path}}` (appends
-  formatted log lines to `{{path}}` in addition to the console) as global CLI options.
-- Log a multi-line startup message (name, version, command, config) and a completion summary (duration, exit
-  code) around operational commands (`greet`, `create`); `help`/`version` stay single-line and unlogged.
+- Provide a minimal reference logger in [Log.java](../src/main/java/myproject/Log.java) with formatted lines, level filtering, and optional file output.
+- Support `-v`/`--verbose`, `--debug` (implying `--verbose`), `--log-level {{level}}` (overriding `--debug`), and `--log-file {{path}}` as global CLI options.
+- Filter standard console streams and `--log-file` output identically against the active log level threshold.
+- Route all log entries to `stderr` when `--format json` is selected, keeping `stdout` strictly valid JSON.
+- Log startup and completion summaries around operational commands (`greet`, `create`), keeping `help` and `version` unlogged.
 
 ---
 
@@ -49,9 +48,9 @@ Functional and technical requirements for the `template.java` project.
 - Enable build caching, all warnings, rich console output, and info logging through root Gradle properties.
 - Declare author and a literal copyright notice in [gradle.properties](../gradle.properties) for derived projects.
 - Test with the JUnit 6 Jupiter framework and the JUnit platform launcher.
-- Generate runnable jar archives through the standard application plugin, with manifest attributes (`Main-Class`, `Implementation-Title`, `Implementation-Version`, `Implementation-Vendor`).
-- Stamp the application JAR with `Build-Time` as an ISO-8601 UTC configuration timestamp by default.
-- Accept that this timestamp changes application archives and repeats packaging, while other eligible tasks keep caching.
+- Stamp `Main-Class`, `Implementation-Title`, `Implementation-Version`, `Implementation-Vendor`, `Copyright`, and `Build-Time` into the runnable jar manifest.
+- Read the manifest `Copyright` notice at runtime in [Cli.java](../src/main/java/myproject/Cli.java), using a neutral fallback when running from classes.
+- Accept that `Build-Time` changes application archives and repeats packaging, while other eligible tasks keep caching.
 - Generate source and Javadoc jars during `build`, including subprojects using the documented common convention.
 - Generate HTML5 Javadoc with doclint disabled and quiet output; retain failure on Javadoc errors.
 - Run Spotless (whitespace) and Checkstyle (Stroustrup braces, braces on every control block, public API Javadoc, [package-info.java](../src/main/java/myproject/package-info.java)) as part of `build`.
