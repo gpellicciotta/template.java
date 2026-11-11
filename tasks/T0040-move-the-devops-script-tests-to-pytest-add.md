@@ -11,6 +11,9 @@ ended_at: —
 review: none
 preview: none
 protocol: adhoc
+usage:
+  worker: {turns: 2, duration_s: 2678.4, input: 575338, output: 119218, cache_read: 19038628}
+work_duration: 1355.9
 ---
 # T0040: Move the devops script tests to pytest, add Ruff checks, and test the minimum supported Python in CI
 
